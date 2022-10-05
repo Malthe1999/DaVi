@@ -1,10 +1,10 @@
 import express, {Request, Response} from "express";
-import * as MachineEventModel from "./models/machine-event";
-import {MachineEvent} from "./types/machine-event";
+import * as Machine from "../react-no-djang/src/models/machine";
+import {MachineEvent} from "../react-no-djang/src/types/machine-event";
 const router = express.Router();
 
 router.get("/", async (req: Request, res: Response) => {
-    MachineEventModel.findOne(385611578151, (err: Error, result: MachineEvent) => {
+    Machine.findOne(159613131356, (err: Error, result: MachineEvent) => {
         if (err) {
             return res.status(500).json({"errorMessage": err.message});
         }
