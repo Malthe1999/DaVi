@@ -1,4 +1,4 @@
-import {db} from "../db";
+import {db} from "../../../database-example/db";
 import {RowDataPacket} from "mysql2";
 
 export const findOne = (id: number, callback: Function) => {
