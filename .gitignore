@@ -104,4 +104,4 @@ dist
 .tern-port
 
 # Local dataset.
-data/borg_sample
+react-no-djang/src/borg_sample

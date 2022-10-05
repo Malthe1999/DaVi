@@ -5,15 +5,24 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import BarChart from './BarChart';
 import {VegaLite} from 'react-vega';
+import {Vega} from 'react-vega';
+import ScatterPlot from './ScatterPlot';
+import collection_events from './borg_sample/collection_events.json'
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+const barData = {
+  name: "table",
+  values: collection_events,
+}
 root.render(
   <React.StrictMode>
     <App />
-    <VegaLite spec={BarChart}></VegaLite>
+    <Vega spec={BarChart} ></Vega>
+    <Vega spec={ScatterPlot} data = {barData} ></Vega>
   </React.StrictMode>
+  
 );
 
 // If you want to start measuring performance in your app, pass a function
