@@ -1,4 +1,4 @@
-import {db} from "../../../database-example/db";
+export {}/*import {db} from "../../../database-example/db";
 import {RowDataPacket} from "mysql2";
 
 export const findOne = (id: number, callback: Function) => {
@@ -18,4 +18,4 @@ export const findOne = (id: number, callback: Function) => {
         let rows = (<RowDataPacket>result);
         callback(null, rows);
     });
-}
+}*/

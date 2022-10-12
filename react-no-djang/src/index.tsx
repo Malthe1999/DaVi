@@ -19,7 +19,7 @@ const barData = {
 root.render(
   <React.StrictMode>
     <App />
-    <Vega spec={BarChart} ></Vega>
+    <Vega spec={BarChart} data = {barData}></Vega>
     <Vega spec={ScatterPlot} data = {barData} ></Vega>
   </React.StrictMode>
   

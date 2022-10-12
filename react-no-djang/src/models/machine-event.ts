@@ -1,4 +1,4 @@
-import {MachineEvent} from "../types/machine-event";
+export {}/*import {MachineEvent} from "../types/machine-event";
 import {db} from "../../../database-example/db";
 import {RowDataPacket} from "mysql2";
 
@@ -24,4 +24,4 @@ export const findOne = (id: number, callback: Function) => {
         }
         callback(null, machineEvent);
     });
-}
+}*/
