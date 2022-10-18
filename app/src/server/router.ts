@@ -4,11 +4,15 @@ import * as InstanceEventRepo from './repository/instance-event';
 import * as InstanceUsageRepo from './repository/instance-usage';
 import * as MachineAttributeRepo from './repository/machine-attribute';
 import * as MachineEventRepo from './repository/machine-event';
+import * as CollectionRepo from './repository/collection';
+import * as MachineRepo from './repository/machine';
 import {CollectionEvent} from '../shared/types/collection-event';
 import {InstanceEvent} from "../shared/types/instance-event";
 import {InstanceUsage} from "../shared/types/instance-usage";
 import {MachineAttributes} from "../shared/types/machine-attributes";
 import {MachineEvent} from "../shared/types/machine-event";
+import {Collection} from "../shared/types/collection";
+import {Machine} from "../shared/types/machine";
 
 const router = express.Router();
 
@@ -68,6 +72,26 @@ router.get("/machine-attribute/machine/:id", async (req: Request, res: Response)
 
 router.get("/machine-event/machine/:id", async (req: Request, res: Response) => {
   MachineEventRepo.findByMachineId(+req.params['id'] , (err: Error, result: MachineEvent[]) => {
+    if (err) {
+      return res.status(500).json({"errorMessage": err.message});
+    }
+
+    res.status(200).json({data: result});
+  });
+});
+
+router.get("/collection/:id", async (req: Request, res: Response) => {
+  CollectionRepo.findById(+req.params['id'] , (err: Error, result: Collection[]) => {
+    if (err) {
+      return res.status(500).json({"errorMessage": err.message});
+    }
+
+    res.status(200).json({data: result});
+  });
+});
+
+router.get("/machine/:id", async (req: Request, res: Response) => {
+  MachineRepo.findById(+req.params['id'] , (err: Error, result: Machine[]) => {
     if (err) {
       return res.status(500).json({"errorMessage": err.message});
     }

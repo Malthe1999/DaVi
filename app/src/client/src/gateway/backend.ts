@@ -3,6 +3,8 @@ import {InstanceEventResponse} from '../../../shared/types/instance-event';
 import {InstanceUsageResponse} from '../../../shared/types/instance-usage';
 import {MachineAttributesResponse} from '../../../shared/types/machine-attributes';
 import {MachineEventResponse} from '../../../shared/types/machine-event';
+import {MachineResult} from '../../../shared/types/machine';
+import {CollectionResult} from '../../../shared/types/collection';
 
 export const getData = async<T>(resource: string) : Promise<T> => {
     const res = await fetch(`http://localhost:17500/api/${resource}`, {
@@ -37,4 +39,12 @@ export const machineEventByMachineId = async (id: number): Promise<MachineEventR
 
 export const machineAttributesByMachineId = async (id: number): Promise<MachineAttributesResponse> => {
     return getData<any>('/machine-attributes/machine/' + id)
+}
+
+export const machineById = async (id: number): Promise<MachineResult> => {
+    return getData<any>('/machine/' + id)
+}
+
+export const collectionById = async (id: number): Promise<CollectionResult> => {
+    return getData<any>('/collection/' + id)
 }

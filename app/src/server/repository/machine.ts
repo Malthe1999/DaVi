@@ -1,17 +1,19 @@
 import {db} from "../db";
 import {RowDataPacket} from "mysql2";
 
-export const findOne = (id: number, callback: any) => {
+export const findById = (id: number, callback: any) => {
     const queryString = `
         SELECT *
-        FROM instance_usage as iu
+        FROM instance_events as ie
+            JOIN instance_usage as iu
+                ON ie.machine_id = iu.machine_id
             JOIN machine_attributes as ma
-                ON iu.machine_id = ma.machine_id
+                ON ie.machine_id = ma.machine_id
             JOIN machine_events as me
-                ON iu.machine_id = me.machine_id
-        WHERE iu.machine_id = ?;`
+                ON ie.machine_id = me.machine_id
+        WHERE ie.machine_id = ?;`
 
-    db.query(queryString, id, (err: any, result: any) => {
+    db.query(queryString, id, (err, result) => {
         if (err) {callback(err)}
         const rows = (result as RowDataPacket);
         callback(null, rows);

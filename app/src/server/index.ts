@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import express, {Express, Request, Response} from "express";
+import express, {Express} from "express";
 import cors from "cors";
 import {router} from "./router";
 
