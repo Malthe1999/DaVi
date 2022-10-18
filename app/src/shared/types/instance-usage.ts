@@ -23,5 +23,5 @@ export interface InstanceUsage {
 }
 
 export type InstanceUsageResponse = {
-    data: InstanceUsage[]
+    table: InstanceUsage[]
 }

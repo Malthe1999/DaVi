@@ -16,5 +16,5 @@ export interface InstanceEvent {
 }
 
 export type InstanceEventResponse = {
-    data: InstanceEvent[]
+    table: InstanceEvent[]
 }

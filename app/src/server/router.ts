@@ -26,7 +26,7 @@ router.get("/collection-event/collection/:id", async (req: Request, res: Respons
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({data: result});
+    res.status(200).json({table: result});
   });
 });
 
@@ -36,7 +36,7 @@ router.get("/instance-event/collection/:id", async (req: Request, res: Response)
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({data: result});
+    res.status(200).json({table: result});
   });
 });
 
@@ -46,7 +46,7 @@ router.get("/instance-event/machine/:id", async (req: Request, res: Response) =>
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({data: result});
+    res.status(200).json({table: result});
   });
 });
 
@@ -56,7 +56,7 @@ router.get("/instance-usage/machine/:id", async (req: Request, res: Response) =>
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({data: result});
+    res.status(200).json({table: result});
   });
 });
 
@@ -66,7 +66,7 @@ router.get("/machine-attribute/machine/:id", async (req: Request, res: Response)
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({data: result});
+    res.status(200).json({table: result});
   });
 });
 
@@ -76,7 +76,7 @@ router.get("/machine-event/machine/:id", async (req: Request, res: Response) => 
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({data: result});
+    res.status(200).json({table: result});
   });
 });
 
@@ -86,7 +86,7 @@ router.get("/collection/:id", async (req: Request, res: Response) => {
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({data: result});
+    res.status(200).json({table: result});
   });
 });
 
@@ -96,7 +96,7 @@ router.get("/machine/:id", async (req: Request, res: Response) => {
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({data: result});
+    res.status(200).json({table: result});
   });
 });
 

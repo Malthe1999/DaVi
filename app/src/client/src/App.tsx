@@ -1,9 +1,13 @@
 import './App.css';
+import Collection from './components/collection';
 import Chart from "./components/chart";
 
 const App = () => {
   return (
-    <Chart></Chart>
+    <>
+      <Collection></Collection>
+      <Chart></Chart>
+    </>
   );
 }
 

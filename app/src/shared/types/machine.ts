@@ -8,5 +8,5 @@ export interface Machine extends InstanceEvent, InstanceUsage, MachineAttributes
 };
 
 export type MachineResult = {
-    data: Machine[]
+    table: Machine[]
 }

@@ -19,5 +19,5 @@ export interface CollectionEvent {
 }
 
 export type CollectionEventResponse = {
-    data: CollectionEvent[]
+    table: CollectionEvent[]
 }

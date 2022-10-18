@@ -3,7 +3,7 @@ import {VisualizationSpec} from 'react-vega';
 export default {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
     description: "Stock prices of 5 Tech Companies over Time.",
-    data: {name: "data"},
+    data: {name: "table"},
     mark: {
         type: "line",
         point: {

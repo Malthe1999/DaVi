@@ -7,5 +7,5 @@ export interface Collection extends CollectionEvent, InstanceEvent, InstanceUsag
 };
 
 export type CollectionResult = {
-    data: Collection[]
+    table: Collection[]
 }
