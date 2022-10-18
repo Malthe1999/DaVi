@@ -11,8 +11,6 @@ export const findOne = (id: number, callback: any) => {
                 ON iu.machine_id = me.machine_id
         WHERE iu.machine_id = ?;`
 
-        // Break this into different objects
-
     db.query(queryString, id, (err: any, result: any) => {
         if (err) {callback(err)}
         const rows = (result as RowDataPacket);

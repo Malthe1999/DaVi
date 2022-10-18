@@ -1,25 +1,24 @@
 import {Vega} from 'react-vega';
 import {useEffect, useState} from 'react';
-import {getData} from "../gateway/backend";
+import {getCollectionEvent} from "../gateway/backend";
 import BarChart from '../charts/line-chart';
+import {CollectionEventResponse} from '../../../shared/types/collection-event';
 
 const Chart = () => {
-    const [data, setData] = useState({
+    const [data, setData] = useState<CollectionEventResponse>({
         data: [],
     });
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         setIsLoading(true);
-        getData<any>("collection-event").then((value) => {
-            value.data.sort();
+        getCollectionEvent(400133700345).then((value) => {
             setData(value)
             setIsLoading(false);
         }, (reason) => {
             console.log(reason)
         });
     }, []);
-
 
     return (
         <>

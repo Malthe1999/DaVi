@@ -17,3 +17,7 @@ export interface CollectionEvent {
     user: string
     vertical_scaling: string
 }
+
+export type CollectionEventResponse = {
+    data: CollectionEvent[]
+}

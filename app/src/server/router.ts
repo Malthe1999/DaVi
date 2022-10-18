@@ -8,8 +8,10 @@ router.get("/", async (req: Request, res: Response) => {
   res.status(200).send('Ok')
 });
 
-router.get("/collection-event", async (req: Request, res: Response) => {
-  CollectionEventRepo.findByCollectionId(400133700345, (err: Error, result: CollectionEvent[]) => {
+// 400133700345
+
+router.get("/collection-event/:id", async (req: Request, res: Response) => {
+  CollectionEventRepo.findByCollectionId(+req.params['id'] , (err: Error, result: CollectionEvent[]) => {
     if (err) {
       return res.status(500).json({"errorMessage": err.message});
     }
