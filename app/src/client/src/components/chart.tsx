@@ -1,6 +1,6 @@
 import {Vega} from 'react-vega';
 import {useEffect, useState} from 'react';
-import {getCollectionEvent} from "../gateway/backend";
+import {collectionEventByCollectionId} from "../gateway/backend";
 import BarChart from '../charts/line-chart';
 import {CollectionEventResponse} from '../../../shared/types/collection-event';
 
@@ -12,7 +12,7 @@ const Chart = () => {
 
     useEffect(() => {
         setIsLoading(true);
-        getCollectionEvent(400133700345).then((value) => {
+        collectionEventByCollectionId(400133700345).then((value) => {
             setData(value)
             setIsLoading(false);
         }, (reason) => {

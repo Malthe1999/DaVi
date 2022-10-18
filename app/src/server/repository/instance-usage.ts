@@ -12,6 +12,6 @@ export const findByMachineId = (id: number, callback: any) => {
         if (err) {callback(err)}
 
         const rows = (result as RowDataPacket);
-        callback(null, rows.map((x: any) => (x) as InstanceUsage));
+        callback(null, rows.map((x: any) => x as InstanceUsage));
     });
 }

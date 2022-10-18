@@ -5,3 +5,7 @@ export interface MachineAttributes {
     value: string
     deleted: number
 }
+
+export type MachineAttributesResponse = {
+    data: MachineAttributes[]
+}

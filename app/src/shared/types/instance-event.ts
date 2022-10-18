@@ -14,3 +14,7 @@ export interface InstanceEvent {
     requested_mem: number
     constraints: string
 }
+
+export type InstanceEventResponse = {
+    data: InstanceEvent[]
+}

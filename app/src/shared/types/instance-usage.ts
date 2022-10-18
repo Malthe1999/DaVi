@@ -21,3 +21,7 @@ export interface InstanceUsage {
     cpu_usage_distribution: string
     tail_cpu_usage_distribution: string
 }
+
+export type InstanceUsageResponse = {
+    data: InstanceUsage[]
+}

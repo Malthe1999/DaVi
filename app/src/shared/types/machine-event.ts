@@ -8,3 +8,7 @@ export interface MachineEvent {
     switch_id: string
     time: number
 }
+
+export type MachineEventResponse = {
+    data: MachineEvent[]
+}

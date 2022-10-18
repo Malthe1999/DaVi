@@ -12,6 +12,6 @@ export const findByCollectionId = (id: number, callback: any) => {
         if (err) {callback(err)}
 
         const rows = (result as RowDataPacket);
-        callback(null, rows.map((x: any) => (x) as CollectionEvent));
+        callback(null, rows.map((x: any) => x as CollectionEvent));
     });
 }
