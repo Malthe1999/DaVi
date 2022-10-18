@@ -20,14 +20,6 @@ const Collection = () => {
         });
     }, []);
 
-    let min = 1;
-    for (let x of data.table) {
-        if (x.start_time > min) {
-            min = x.start_time
-        }
-    }
-    console.log(min)
-
     return (
         <>
             {isLoading ? (
