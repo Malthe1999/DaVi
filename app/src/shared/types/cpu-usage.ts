@@ -1,6 +1,6 @@
 export interface CpuUsage {
     id: string
-    colid: number
+    colid: string
     cpuusage: number 
 }
 export type CpuUsageResponse = {
