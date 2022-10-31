@@ -10,5 +10,5 @@ export interface MachineEvent {
 }
 
 export type MachineEventResponse = {
-    table: MachineEvent[]
+    data: MachineEvent[]
 }

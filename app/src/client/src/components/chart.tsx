@@ -6,7 +6,7 @@ import {CollectionEventResponse} from '../../../shared/types/collection-event';
 
 const Chart = () => {
     const [data, setData] = useState<CollectionEventResponse>({
-        table: [],
+        data: [],
     });
     const [isLoading, setIsLoading] = useState(false);
 

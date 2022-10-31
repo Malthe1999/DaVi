@@ -6,7 +6,7 @@ import {InstanceUsageResponse} from '../../../shared/types/instance-usage';
 
 const Collection = () => {
     const [data, setData] = useState<InstanceUsageResponse>({
-        table: [],
+        data: [],
     });
     const [isLoading, setIsLoading] = useState(false);
 

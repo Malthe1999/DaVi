@@ -6,7 +6,7 @@ export default {
     "width": 500,
     "height": 200,
     "padding": 5,
-    "data": [{"name": "table"}],
+    "data": [{"name": "data"}],
 
     "scales": [
         {
@@ -15,7 +15,7 @@ export default {
             "round": true,
             "nice": true,
             "zero": false,
-            "domain": {"data": "table", "field": "start_time"},
+            "domain": {"data": "data", "field": "start_time"},
             "range": "width"
         },
         {
@@ -24,7 +24,7 @@ export default {
             "round": true,
             "nice": true,
             "zero": true,
-            "domain": {"data": "table", "field": "average_mem"},
+            "domain": {"data": "data", "field": "average_mem"},
             "range": "height"
         },
     ],
@@ -51,7 +51,7 @@ export default {
         {
             "name": "marks",
             "type": "symbol",
-            "from": {"data": "table"},
+            "from": {"data": "data"},
             "encode": {
                 "update": {
                     "x": {"scale": "x", "field": "start_time"},

@@ -5,6 +5,7 @@ import {MachineAttributesResponse} from '../../../shared/types/machine-attribute
 import {MachineEventResponse} from '../../../shared/types/machine-event';
 import {MachineResult} from '../../../shared/types/machine';
 import {CollectionResult} from '../../../shared/types/collection';
+import {CollectionSizeResponse} from '../../../shared/types/collection-size';
 
 export const getData = async<T>(resource: string) : Promise<T> => {
     const res = await fetch(`http://localhost:17500/api/${resource}`, {
@@ -47,4 +48,8 @@ export const machineById = async (id: number): Promise<MachineResult> => {
 
 export const collectionById = async (id: number): Promise<CollectionResult> => {
     return getData<any>('/collection/' + id)
+}
+
+export const allCollectionSizes = async (): Promise<CollectionSizeResponse> => {
+    return getData<any>('/collection-size/all')
 }

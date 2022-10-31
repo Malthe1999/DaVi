@@ -6,6 +6,7 @@ import * as MachineAttributeRepo from './repository/machine-attribute';
 import * as MachineEventRepo from './repository/machine-event';
 import * as CollectionRepo from './repository/collection';
 import * as MachineRepo from './repository/machine';
+import * as CollectionSizeRepo from './repository/collection-size';
 import {CollectionEvent} from '../shared/types/collection-event';
 import {InstanceEvent} from "../shared/types/instance-event";
 import {InstanceUsage} from "../shared/types/instance-usage";
@@ -13,6 +14,7 @@ import {MachineAttributes} from "../shared/types/machine-attributes";
 import {MachineEvent} from "../shared/types/machine-event";
 import {Collection} from "../shared/types/collection";
 import {Machine} from "../shared/types/machine";
+import {CollectionSize} from "../shared/types/collection-size";
 
 const router = express.Router();
 
@@ -26,7 +28,7 @@ router.get("/collection-event/collection/:id", async (req: Request, res: Respons
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({table: result});
+    res.status(200).json({data: result});
   });
 });
 
@@ -36,7 +38,7 @@ router.get("/instance-event/collection/:id", async (req: Request, res: Response)
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({table: result});
+    res.status(200).json({data: result});
   });
 });
 
@@ -46,7 +48,7 @@ router.get("/instance-event/machine/:id", async (req: Request, res: Response) =>
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({table: result});
+    res.status(200).json({data: result});
   });
 });
 
@@ -56,7 +58,7 @@ router.get("/instance-usage/machine/:id", async (req: Request, res: Response) =>
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({table: result});
+    res.status(200).json({data: result});
   });
 });
 
@@ -66,7 +68,7 @@ router.get("/machine-attribute/machine/:id", async (req: Request, res: Response)
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({table: result});
+    res.status(200).json({data: result});
   });
 });
 
@@ -76,7 +78,7 @@ router.get("/machine-event/machine/:id", async (req: Request, res: Response) => 
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({table: result});
+    res.status(200).json({data: result});
   });
 });
 
@@ -86,7 +88,7 @@ router.get("/collection/:id", async (req: Request, res: Response) => {
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({table: result});
+    res.status(200).json({data: result});
   });
 });
 
@@ -96,7 +98,17 @@ router.get("/machine/:id", async (req: Request, res: Response) => {
       return res.status(500).json({"errorMessage": err.message});
     }
 
-    res.status(200).json({table: result});
+    res.status(200).json({data: result});
+  });
+});
+
+router.get("/collection-size/all", async (req: Request, res: Response) => {
+  CollectionSizeRepo.allCollectionSizes((err: Error, result: CollectionSize[]) => {
+    if (err) {
+      return res.status(500).json({"errorMessage": err.message});
+    }
+
+    res.status(200).json({data: result});
   });
 });
 

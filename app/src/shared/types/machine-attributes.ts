@@ -7,5 +7,5 @@ export interface MachineAttributes {
 }
 
 export type MachineAttributesResponse = {
-    table: MachineAttributes[]
+    data: MachineAttributes[]
 }
