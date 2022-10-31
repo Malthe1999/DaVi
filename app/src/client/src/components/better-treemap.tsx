@@ -1,12 +1,12 @@
 import {useEffect, useState} from 'react';
 import Plot from 'react-plotly.js';
 import {CollectionSizeResponse} from '../../../shared/types/collection-size';
-import { CollectionSpreadResponse } from '../../../shared/types/collection-spread';
-import { CpuUsage, CpuUsageResponse } from '../../../shared/types/cpu-usage';
+import {CollectionSpreadResponse} from '../../../shared/types/collection-spread';
+import {CpuUsage, CpuUsageResponse} from '../../../shared/types/cpu-usage';
 import {allCollectionSizes, allCollectionSpread, allCpuUsage} from '../gateway/backend';
 import {randomName} from '../util/name-generator';
-function unpack(rows:any, key:any) {
-  return rows.map(function(row:any) { return row[key]});
+function unpack(rows: any, key: any) {
+  return rows.map(function (row: any) {return row[key]});
 }
 
 export const TreeMapNot = () => {
@@ -49,6 +49,7 @@ export const TreeMapNot = () => {
     </>
   )
 }
+
 export const TreeMap = () => {
   const [data, setData] = useState<CpuUsageResponse>({
     data: [],
@@ -60,34 +61,38 @@ export const TreeMap = () => {
   const [data3, setData3] = useState<CpuUsageResponse>({
     data: [],
   });
-  var temp:CpuUsage;
-  useEffect( () => {
+  var temp: CpuUsage;
+  useEffect(() => {
     setIsLoading(true);
     allCpuUsage().then((value) => {
       setData(value)
     }, (reason) => {
       console.log(reason)
     });
-  allCollectionSpread().then((value2) => {
-    setData2(value2)
-    let data4 = []
-    data2.data.forEach( (element) => 
-      temp = {
-        cpuusage: 0.00000001,
-        id: element.id,
-        colid: ''
-      },
-      data4.push(temp),
-    )
-    console.log("SETTING");
-    setData3({data: data4})
-    setIsLoading(false);
-  }, (reason) => {
-    console.log(reason)
+    allCollectionSpread().then((value2) => {
+      setData2(value2)
+      let data4: Array<CpuUsage> = [];
+      value2.data.forEach((element) => {
+        temp = {
+          cpuusage: 0.00000001,
+          id: element.id,
+          colid: ''
+        };
+          data4.push(temp);
+      })
+      setData3({data: data4})
+      setIsLoading(false);
+    }, (reason) => {
+      console.log(reason)
     });
   }, []);
-  console.log("ONE TIME")
-  console.log(data3.data)
+
+  if (data == undefined || data3 == undefined) {
+    return (<></>);
+  }
+
+  let final = [...data.data, ...data3.data];
+  console.log(final)
 
   return (
     <>
@@ -99,9 +104,9 @@ export const TreeMap = () => {
             data={
               [
                 {
-                  labels: unpack(data3.data, 'id'),
-                  parents: unpack(data3.data, 'colid'), // no parents
-                  values: unpack(data3.data, 'colid'),
+                  labels: unpack(final, 'id'),
+                  parents: unpack(final, 'colid'), // no parents
+                  values: unpack(final, 'colid'),
                   type: 'treemap',
                 },
               ]
@@ -113,4 +118,3 @@ export const TreeMap = () => {
     </>
   )
 }
-
