@@ -7,6 +7,7 @@ import {MachineResult} from '../../../shared/types/machine';
 import {CollectionResult} from '../../../shared/types/collection';
 import {CollectionSizeResponse} from '../../../shared/types/collection-size';
 import {CpuUsageResponse} from '../../../shared/types/cpu-usage';
+import {CollectionSpreadResponse} from '../../../shared/types/collection-spread';
 
 export const getData = async<T>(resource: string) : Promise<T> => {
     const res = await fetch(`http://localhost:17500/api/${resource}`, {
@@ -56,4 +57,7 @@ export const allCollectionSizes = async (): Promise<CollectionSizeResponse> => {
 }
 export const allCpuUsage = async (): Promise<CpuUsageResponse> => {
     return getData<any>('/cpu-usage/all')
+}
+export const allCollectionSpread = async (): Promise<CollectionSpreadResponse> => {
+    return getData<any>('/collection-spread/all')
 }

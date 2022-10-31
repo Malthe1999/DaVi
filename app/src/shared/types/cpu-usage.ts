@@ -1,7 +1,7 @@
 export interface CpuUsage {
-    id: number
-    name: string
-    size: number // number of instances per collection
+    id: string
+    colid: number
+    cpuusage: number 
 }
 export type CpuUsageResponse = {
     data: CpuUsage[]
