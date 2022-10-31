@@ -7,6 +7,7 @@ import * as MachineEventRepo from './repository/machine-event';
 import * as CollectionRepo from './repository/collection';
 import * as MachineRepo from './repository/machine';
 import * as CollectionSizeRepo from './repository/collection-size';
+import * as CpuUsageRepo from './repository/cpu-usage';
 import {CollectionEvent} from '../shared/types/collection-event';
 import {InstanceEvent} from "../shared/types/instance-event";
 import {InstanceUsage} from "../shared/types/instance-usage";
@@ -15,6 +16,7 @@ import {MachineEvent} from "../shared/types/machine-event";
 import {Collection} from "../shared/types/collection";
 import {Machine} from "../shared/types/machine";
 import {CollectionSize} from "../shared/types/collection-size";
+import { CpuUsage } from "../shared/types/cpu-usage";
 
 const router = express.Router();
 
@@ -104,6 +106,15 @@ router.get("/machine/:id", async (req: Request, res: Response) => {
 
 router.get("/collection-size/all", async (req: Request, res: Response) => {
   CollectionSizeRepo.allCollectionSizes((err: Error, result: CollectionSize[]) => {
+    if (err) {
+      return res.status(500).json({"errorMessage": err.message});
+    }
+
+    res.status(200).json({data: result});
+  });
+});
+router.get("/cpu-usage/all", async (req: Request, res: Response) => {
+  CpuUsageRepo.allCpuUsage((err: Error, result: CpuUsage[]) => {
     if (err) {
       return res.status(500).json({"errorMessage": err.message});
     }
