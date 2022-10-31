@@ -106,7 +106,7 @@ export const TreeMap = () => {
                 {
                   labels: unpack(final, 'id'),
                   parents: unpack(final, 'colid'), // no parents
-                  values: unpack(final, 'colid'),
+                  values: unpack(final, 'cpuusage'),
                   type: 'treemap',
                 },
               ]
