@@ -5,10 +5,10 @@ import { CollectionSpread } from "../../shared/types/collection-spread";
 
 export const allCpuUsage = (callback: any) => {
     const queryString = `
-    SELECT CONCAT(iu.collection_id, iu.start_time, iu.instance_index) as id,
-     iu.collection_id as colid, iu.average_cpu as cpuusage 
+    SELECT CONCAT(iu.collection_id, iu.instance_index) as id,
+     iu.collection_id as colid, SUM(iu.average_cpu) as cpuusage 
      FROM instance_usage as iu
-     WHERE iu.machine_id = 330384008461;`
+     GROUP BY iu.collection_id, iu.instance_index`
     db.query(queryString, (err, result) => {
         if (err) {callback(err)}
 
