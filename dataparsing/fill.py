@@ -41,11 +41,13 @@ CREATE_TABLE_COLLECTION_EVENTS = """
         priority INT,
         scheduler VARCHAR(20),
         scheduling_class VARCHAR(20),
-        start_after_collection_ids BIGINT,
+        start_after_collection_ids VARCHAR(1000),
         time BIGINT,
         type VARCHAR(20),
         user VARCHAR(250),
-        vertical_scaling VARCHAR(40)
+        vertical_scaling VARCHAR(40),
+        INDEX (collection_id),
+        INDEX (parent_collection_id)
     );
 """
 
@@ -80,7 +82,8 @@ CREATE_TABLE_MACHINE_EVENTS = """
         missing_data_reason VARCHAR(30),
         platform_id VARCHAR(250),
         switch_id VARCHAR(250),
-        time BIGINT
+        time BIGINT,
+        INDEX (machine_id)
     );
 """
 
@@ -103,7 +106,8 @@ CREATE_TABLE_MACHINE_ATTRIBUTES = """
         machine_id BIGINT,
         name VARCHAR(250),
         value VARCHAR(250),
-        deleted BOOLEAN
+        deleted BOOLEAN,
+        INDEX (machine_id)
     );
 """
 
@@ -132,7 +136,10 @@ CREATE_TABLE_INSTANCE_EVENTS = """
         alloc_instance_index INT,
         requested_cpu DOUBLE,
         requested_mem DOUBLE,
-        constraints TEXT
+        constraints TEXT,
+        INDEX (machine_id),
+        INDEX (collection_id),
+        INDEX (instance_index)
     );
 """
 
@@ -177,7 +184,10 @@ CREATE_TABLE_INSTANCE_USAGE = """
         memory_accesses_per_instruction DOUBLE,
         sample_rate DOUBLE,
         cpu_usage_distribution TEXT,
-        tail_cpu_usage_distribution TEXT
+        tail_cpu_usage_distribution TEXT,
+        INDEX (collection_id),
+        INDEX (machine_id),
+        INDEX (instance_index)
     );
 """
 
@@ -278,9 +288,20 @@ scheduler = {
 
 # Functions to read json files and insert the data to an sql table
 
+def json_load(file):
+    # Json files exported from bigquery contain 1 JSON object on each row
+    # But they are not inside a JSON array []
+    lines = file.readlines()
+    result = []
+    for line in lines:
+        if line.strip() == '':
+            continue
+        result.append(json.loads(line))
+    return result
+
 def fill_collection_events(db):
     with open(collection_events_path) as file:
-        entities = json.load(file)
+        entities = json_load(file)
 
     # if you see a field with the name KEY, apply the VALUE function to it
     maps = {
@@ -308,6 +329,8 @@ def fill_collection_events(db):
                 insert_ready[-1][key] = maps[key][value]
             elif isinstance(value, str) and value.isnumeric():
                 insert_ready[-1][key] = int(value)
+            elif key == 'start_after_collection_ids':
+                insert_ready[-1][key] = json.dumps(x[key])
 
         # We occasionally commit the parsed json to the DB so we don't use too much RAM
         if i % 100 == 0:
@@ -325,7 +348,7 @@ def fill_collection_events(db):
 
 def fill_machine_events(db):
     with open(machine_events_path) as file:
-        entities = json.load(file)
+        entities = json_load(file)
 
     maps = {
         'type': machine_event_type,
@@ -364,7 +387,7 @@ def fill_machine_events(db):
 
 def fill_instance_usage(db):
     with open(instance_usage_path) as file:
-        entities = json.load(file)
+        entities = json_load(file)
 
     maps = {
         'collection_type': collection_type,
@@ -413,7 +436,7 @@ def fill_instance_usage(db):
 
 def fill_instance_events(db):
     with open(instance_events_path) as file:
-        entities = json.load(file)
+        entities = json_load(file)
 
     maps = {
         'type': event_type,
@@ -455,7 +478,7 @@ def fill_instance_events(db):
 
 def fill_machine_attributes(db):
     with open(machine_attributes_path) as file:
-        entities = json.load(file)
+        entities = json_load(file)
 
     print()
     insert_ready = []
@@ -498,11 +521,11 @@ def drop_tables(db):
         cursor.execute('DROP TABLE IF EXISTS instance_usage')
 
 def fill_tables(db):
-    fill_instance_usage(db)
-    fill_instance_events(db)
     fill_collection_events(db)
     fill_machine_events(db)
     fill_machine_attributes(db)
+    fill_instance_events(db)
+    fill_instance_usage(db)
 
 if __name__ == '__main__':
     try:
@@ -518,4 +541,3 @@ if __name__ == '__main__':
     finally:
         if db.is_connected():
             db.close()
-
