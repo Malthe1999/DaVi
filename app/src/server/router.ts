@@ -17,6 +17,7 @@ import {Collection} from "../shared/types/collection";
 import {Machine} from "../shared/types/machine";
 import {CollectionSize} from "../shared/types/collection-size";
 import { CpuUsage } from "../shared/types/cpu-usage";
+import { CollectionSpread } from "../shared/types/collection-spread";
 
 const router = express.Router();
 
@@ -115,6 +116,15 @@ router.get("/collection-size/all", async (req: Request, res: Response) => {
 });
 router.get("/cpu-usage/all", async (req: Request, res: Response) => {
   CpuUsageRepo.allCpuUsage((err: Error, result: CpuUsage[]) => {
+    if (err) {
+      return res.status(500).json({"errorMessage": err.message});
+    }
+
+    res.status(200).json({data: result});
+  });
+});
+router.get("/collection-spread/all", async (req: Request, res: Response) => {
+  CpuUsageRepo.allCollectionSpread((err: Error, result: CollectionSpread[]) => {
     if (err) {
       return res.status(500).json({"errorMessage": err.message});
     }
