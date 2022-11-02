@@ -16,6 +16,7 @@ export const allCpuUsage = (callback: any) => {
         callback(null, rows.map((x: any) => x as CpuUsage));
     });
 }
+
 export const allCollectionSpread = (callback: any) => {
     const queryString = `
     SELECT DISTINCT ce.collection_id as id
@@ -26,5 +27,18 @@ export const allCollectionSpread = (callback: any) => {
 
         const rows = (result as RowDataPacket);
         callback(null, rows.map((x: any) => x as CollectionSpread));
+    });
+}
+export const allCpuUsageMachine = (callback: any) => {
+    const queryString = `
+    SELECT CONCAT(iu.collection_id, iu.machine_id) as id,
+     iu.collection_id as colid, SUM(iu.average_cpu) as cpuusage 
+     FROM instance_usage as iu
+     GROUP BY iu.collection_id, iu.machine_id`
+    db.query(queryString, (err, result) => {
+        if (err) {callback(err)}
+
+        const rows = (result as RowDataPacket);
+        callback(null, rows.map((x: any) => x as CpuUsage));
     });
 }

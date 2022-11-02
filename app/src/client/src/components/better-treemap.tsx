@@ -72,11 +72,17 @@ export const TreeMap = () => {
     allCollectionSpread().then((value2) => {
       setData2(value2)
       let data4: Array<CpuUsage> = [];
+      temp = {
+        cpuusage: 0,
+        id: '0',
+        colid: ''
+      };
+      data4.push(temp);
       value2.data.forEach((element) => {
         temp = {
-          cpuusage: 0.00000001,
+          cpuusage: 0,
           id: element.id,
-          colid: ''
+          colid: '0'
         };
           data4.push(temp);
       })
@@ -108,6 +114,8 @@ export const TreeMap = () => {
                   parents: unpack(final, 'colid'), // no parents
                   values: unpack(final, 'cpuusage'),
                   type: 'treemap',
+                  branchvalues: 'remainder',
+                  maxdepth: 2,
                 },
               ]
             }
