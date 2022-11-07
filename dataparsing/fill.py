@@ -80,6 +80,7 @@ CREATE_TABLE_MACHINE_EVENTS = """
         machine_event VARCHAR(10),
         machine_id BIGINT,
         missing_data_reason VARCHAR(30),
+        type VARCHAR(10),
         platform_id VARCHAR(250),
         switch_id VARCHAR(250),
         time BIGINT,
@@ -93,6 +94,7 @@ machine_events_fields = [
     'machine_event',
     'machine_id',
     'missing_data_reason',
+    'type',
     'platform_id',
     'switch_id', 
     'time'

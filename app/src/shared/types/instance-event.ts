@@ -18,3 +18,11 @@ export interface InstanceEvent {
 export type InstanceEventResponse = {
     data: InstanceEvent[]
 }
+
+export type RequestedInstanceResources = {
+    collection_id: number
+    machine_id: number
+    instance_index: number
+    requested_cpu: number
+    requested_mem: number
+}

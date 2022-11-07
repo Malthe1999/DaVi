@@ -105,3 +105,4 @@ dist
 
 # Local dataset.
 react-no-djang/src/borg_sample
+dataparsing/*.json

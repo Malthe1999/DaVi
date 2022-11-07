@@ -1,6 +1,6 @@
 import {CollectionEventResponse} from '../../../shared/types/collection-event';
 import {InstanceEventResponse} from '../../../shared/types/instance-event';
-import {InstanceUsageResponse} from '../../../shared/types/instance-usage';
+import {AverageCpuUsagePerCollectionResult, InstanceUsageResponse} from '../../../shared/types/instance-usage';
 import {MachineAttributesResponse} from '../../../shared/types/machine-attributes';
 import {MachineEventResponse} from '../../../shared/types/machine-event';
 import {MachineResult} from '../../../shared/types/machine';
@@ -56,8 +56,12 @@ export const allCollectionSizes = async (): Promise<CollectionSizeResponse> => {
     return getData<any>('/collection-size/all')
 }
 export const allCpuUsage = async (): Promise<CpuUsageResponse> => {
-    return getData<any>('/cpu-usage/all')
+    return getData<CpuUsageResponse>('/cpu-usage/all')
 }
 export const allCollectionSpread = async (): Promise<CollectionSpreadResponse> => {
     return getData<any>('/collection-spread/all')
+}
+
+export const averageCpuUsagePerCollection = async (): Promise<AverageCpuUsagePerCollectionResult> => {
+    return getData<any>('average-cpu-per-collection')
 }

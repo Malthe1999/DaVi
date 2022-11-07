@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
-import express, {Express} from "express";
+import express, { Express } from "express";
 import cors from "cors";
-import {router} from "./router";
+import { router } from "./router";
 
 dotenv.config();
 
@@ -13,5 +13,5 @@ app.use("/api", router);
 
 const port = process.env.PORT || 17500;
 app.listen(port, () => {
-    // console.log(`API app listening on port ${port}`)
+  // console.log(`API app listening on port ${port}`)
 });
