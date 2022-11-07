@@ -1,4 +1,4 @@
-import { CollectionEventResponse } from "../../../shared/types/collection-event";
+import { CollectionEventResponse, Parent } from "../../../shared/types/collection-event";
 import {
   InstanceEventResponse,
   RequestedInstanceResources,
@@ -87,7 +87,13 @@ export const averageCpuUsagePerCollection =
   };
 
 export const requestedInstanceResources = async () => {
-  return getData<any>("requested-instance-resources")
-    .then((res) => res.data as Array<RequestedInstanceResources>)
+  return await getData<any>("requested-instance-resources")
+    .then((res) => res.data as RequestedInstanceResources[])
+    .catch((err) => err as Error);
+};
+
+export const collectionParents = async () => {
+  return await getData<any>("collection-parents")
+    .then((res) => res.data as Array<Parent>)
     .catch((err) => err as Error);
 };

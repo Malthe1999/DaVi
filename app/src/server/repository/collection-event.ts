@@ -1,8 +1,8 @@
-import { db } from "../db";
+import { db, dbAsync } from "../db";
 import { RowDataPacket } from "mysql2";
-import { CollectionEvent } from "../../shared/types/collection-event";
+import { CollectionEvent, Parent } from "../../shared/types/collection-event";
 
-export const findByCollectionId = (id: number, callback: any) => {
+const findByCollectionId = (id: number, callback: any) => {
   const queryString = `
     SELECT *
     FROM collection_events as t
@@ -21,11 +21,11 @@ export const findByCollectionId = (id: number, callback: any) => {
   });
 };
 
-export const parents = async () => {
+const parents = async () => {
   const queryString = `
-    SELECT collection_id, SUM(average_cpu)/COUNT(*) as average_cpu
-    FROM instance_usage
-    GROUP BY collection_id`;
+  SELECT parent_collection_id, collection_id
+  FROM collection_events
+  GROUP BY parent_collection_id, collection_id`
 
   return await dbAsync()
     .then((db) =>
@@ -33,10 +33,12 @@ export const parents = async () => {
         .query(queryString)
         .then((res) =>
           (res[0] as RowDataPacket[]).map(
-            (x: any) => x as AverageCpuUsagePerCollection
+            (x: any) => x as Parent
           )
         )
         .catch((err) => err)
     )
     .catch((err) => err);
 };
+
+export {parents, findByCollectionId};

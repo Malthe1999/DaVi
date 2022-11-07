@@ -1,128 +1,109 @@
-import {useEffect, useState} from 'react';
-import Plot from 'react-plotly.js';
-import {CollectionSizeResponse} from '../../../shared/types/collection-size';
-import {CollectionSpreadResponse} from '../../../shared/types/collection-spread';
-import {CpuUsage, CpuUsageResponse} from '../../../shared/types/cpu-usage';
-import {allCollectionSizes, allCollectionSpread, allCpuUsage} from '../gateway/backend';
-import {randomName} from '../util/name-generator';
+import { useEffect, useState } from "react";
+import Plot from "react-plotly.js";
+import { Parent } from "../../../shared/types/collection-event";
+import { RequestedInstanceResources } from "../../../shared/types/instance-event";
+import {
+  collectionParents,
+  requestedInstanceResources,
+} from "../gateway/backend";
 function unpack(rows: any, key: any) {
-  return rows.map(function (row: any) {return row[key]});
-}
-
-export const TreeMapNot = () => {
-  const [data, setData] = useState<CollectionSizeResponse>({
-    data: [],
+  return rows.map((row: any) => {
+    return row[key];
   });
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    setIsLoading(true);
-    allCollectionSizes().then((value) => {
-      setData(value)
-      setIsLoading(false);
-    }, (reason) => {
-      console.log(reason)
-    });
-  }, []);
-
-  return (
-    <>
-      {
-        isLoading ? (
-          <div>...Loading</div >
-        ) : (
-          <Plot
-            data={
-              [
-                {
-                  labels: data.data.map(x => randomName(x.name)),
-                  parents: data.data.map(x => ''), // no parents
-                  values: data.data.map(x => x.size),
-                  type: 'treemap',
-                },
-              ]
-            }
-            layout={{width: 1200, height: 800, title: 'TODO: Change this title'}}
-          />
-        )
-      }
-    </>
-  )
 }
 
 export const TreeMap = () => {
-  const [data, setData] = useState<CpuUsageResponse>({
-    data: [],
-  });
-  const [data2, setData2] = useState<CollectionSpreadResponse>({
-    data: [],
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [data3, setData3] = useState<CpuUsageResponse>({
-    data: [],
-  });
-  var temp: CpuUsage;
+  const [instanceResources, setData] = useState<RequestedInstanceResources[]>(
+    []
+  );
+  const [parents, setParents] = useState<Parent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    setIsLoading(true);
-    allCpuUsage().then((value) => {
-      setData(value)
-    }, (reason) => {
-      console.log(reason)
-    });
-    allCollectionSpread().then((value2) => {
-      setData2(value2)
-      let data4: Array<CpuUsage> = [];
-      temp = {
-        cpuusage: 0,
-        id: '0',
-        colid: ''
-      };
-      data4.push(temp);
-      value2.data.forEach((element) => {
-        temp = {
-          cpuusage: 0,
-          id: element.id,
-          colid: '0'
-        };
-          data4.push(temp);
-      })
-      setData3({data: data4})
-      setIsLoading(false);
-    }, (reason) => {
-      console.log(reason)
-    });
+    Promise.all([
+      requestedInstanceResources()
+        .then((x) => setData(x as RequestedInstanceResources[]))
+        .catch((err) => console.log(err)),
+      collectionParents()
+        .then((x) => setParents(x as Parent[]))
+        .catch((err) => console.log(err)),
+    ]).finally(() => setIsLoading(false));
   }, []);
 
-  if (data == undefined || data3 == undefined) {
-    return (<></>);
+  if (isLoading) {
+    return <div>Loading</div>;
   }
 
-  let final = [...data.data, ...data3.data];
-  console.log(final)
+  const totalColor = "red";
+  const nodeColor = "blue";
+  const leafColor = "green";
+  const machineColor = "yellow";
+  const instanceColor = "pink";
+  let tree = [{ parent: "", child: "Total", weight: 1, color: totalColor }];
+  tree.push();
+
+  let hasChildren = new Set();
+  for (let x of parents) {
+    hasChildren.add(x.parent_collection_id);
+  }
+
+  for (let x of parents) {
+    tree.push({
+      parent:
+        x.parent_collection_id == null
+          ? "Total"
+          : x.parent_collection_id.toString(),
+      child: x.collection_id.toString(),
+      weight: 1,
+      color: hasChildren.has(x.collection_id) ? nodeColor : leafColor,
+    });
+  }
+
+  const unspecifiedMachines = new Set();
+  for (let x of instanceResources) {
+    if (unspecifiedMachines.has(`${x.collection_id}.${x.machine_id}`)) {
+      continue;
+    }
+
+    unspecifiedMachines.add(`${x.collection_id}.${x.machine_id}`);
+    tree.push({
+      parent: `${x.collection_id}`,
+      child: `${x.collection_id}_${x.machine_id}`,
+      weight: 1,
+      color: machineColor,
+    });
+  }
+
+  for (let x of instanceResources) {
+    tree.push({
+      parent: `${x.collection_id}_${x.machine_id}`,
+      child: `${x.collection_id}.${x.machine_id}.${x.instance_index}`,
+      weight: 1,
+      color: instanceColor,
+    });
+  }
 
   return (
     <>
-      {
-        isLoading ? (
-          <div>...Loading</div >
-        ) : (
-          <Plot
-            data={
-              [
-                {
-                  labels: unpack(final, 'id'),
-                  parents: unpack(final, 'colid'), // no parents
-                  values: unpack(final, 'cpuusage'),
-                  type: 'treemap',
-                  branchvalues: 'remainder',
-                  maxdepth: 2,
-                },
-              ]
-            }
-            layout={{width: 1200, height: 800, title: 'TODO: Change this title'}}
-          />
-        )
-      }
+      <Plot
+        data={[
+          {
+            labels: unpack(tree, "child"),
+            parents: unpack(tree, "parent"),
+            values: unpack(tree, "weight"),
+            marker: {
+              colors: unpack(tree, "color"),
+            },
+            type: "treemap",
+            branchvalues: "remainder",
+            maxdepth: 2,
+          },
+        ]}
+        layout={{
+          width: 1200,
+          height: 800,
+          title: "TODO: Change this title",
+        }}
+      />
     </>
-  )
-}
+  );
+};

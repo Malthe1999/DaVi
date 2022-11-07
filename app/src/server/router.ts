@@ -1,5 +1,4 @@
 import express, { Request, Response } from "express";
-import * as CollectionEventRepo from "./repository/collection-event";
 import * as InstanceEventRepo from "./repository/instance-event";
 import { requestedInstances } from "./repository/instance-event";
 import * as InstanceUsageRepo from "./repository/instance-usage";
@@ -19,6 +18,7 @@ import { Machine } from "../shared/types/machine";
 import { CollectionSize } from "../shared/types/collection-size";
 import { CpuUsage } from "../shared/types/cpu-usage";
 import { CollectionSpread } from "../shared/types/collection-spread";
+import {findByCollectionId, parents} from "./repository/collection-event";
 
 const router = express.Router();
 
@@ -29,7 +29,7 @@ router.get("/", async (req: Request, res: Response) => {
 router.get(
   "/collection-event/collection/:id",
   async (req: Request, res: Response) => {
-    CollectionEventRepo.findByCollectionId(
+    findByCollectionId(
       +req.params["id"],
       (err: Error, result: CollectionEvent[]) => {
         if (err) {
@@ -191,6 +191,14 @@ router.get(
   "/requested-instance-resources",
   async (req: Request, res: Response) =>
     await requestedInstances()
+      .then((result) => res.status(200).json({ data: result }))
+      .catch((err) => res.status(500).json({ errorMessage: err.message }))
+);
+
+router.get(
+  "/collection-parents",
+  async (req: Request, res: Response) =>
+    await parents()
       .then((result) => res.status(200).json({ data: result }))
       .catch((err) => res.status(500).json({ errorMessage: err.message }))
 );

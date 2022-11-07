@@ -6,7 +6,7 @@ const App = () => {
   return (
     <>
       <TreeMap></TreeMap>
-      <TreeMapwSlider></TreeMapwSlider>
+      {/* <TreeMapwSlider></TreeMapwSlider> */}
     </>
   );
 }
