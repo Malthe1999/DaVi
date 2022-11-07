@@ -20,3 +20,23 @@ export const findByCollectionId = (id: number, callback: any) => {
     );
   });
 };
+
+export const parents = async () => {
+  const queryString = `
+    SELECT collection_id, SUM(average_cpu)/COUNT(*) as average_cpu
+    FROM instance_usage
+    GROUP BY collection_id`;
+
+  return await dbAsync()
+    .then((db) =>
+      db
+        .query(queryString)
+        .then((res) =>
+          (res[0] as RowDataPacket[]).map(
+            (x: any) => x as AverageCpuUsagePerCollection
+          )
+        )
+        .catch((err) => err)
+    )
+    .catch((err) => err);
+};

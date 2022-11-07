@@ -18,11 +18,13 @@ export const dbAsync = async () => {
     return _db;
   }
 
-  await mysqlAsync.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PWD,
-    database: process.env.DB_NAME,
-  }).then(conn => _db = conn)
+  await mysqlAsync
+    .createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PWD,
+      database: process.env.DB_NAME,
+    })
+    .then((conn) => (_db = conn));
   return _db;
-}
+};

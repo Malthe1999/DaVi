@@ -55,7 +55,7 @@ const requestedInstances = async () => {
         .query(queryString)
         .then((res) =>
           (res[0] as RowDataPacket[]).map(
-            (x: any) => x as RequestedInstanceResources
+            (x) => x as RequestedInstanceResources
           )
         )
         .catch((err) => err)
