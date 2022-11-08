@@ -74,7 +74,7 @@ export const TreeMap = () => {
       let data4: Array<CpuUsage> = [];
       temp = {
         cpuusage: 0,
-        id: '0',
+        id: 'Total',
         colid: ''
       };
       data4.push(temp);
@@ -82,7 +82,7 @@ export const TreeMap = () => {
         temp = {
           cpuusage: 0,
           id: element.id,
-          colid: '0'
+          colid: 'Total'
         };
           data4.push(temp);
       })
@@ -115,7 +115,7 @@ export const TreeMap = () => {
                   values: unpack(final, 'cpuusage'),
                   type: 'treemap',
                   branchvalues: 'remainder',
-                  maxdepth: 2,
+                  maxdepth: 3,
                 },
               ]
             }
