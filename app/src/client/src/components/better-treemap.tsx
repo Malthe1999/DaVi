@@ -5,6 +5,7 @@ import {CollectionSpreadResponse} from '../../../shared/types/collection-spread'
 import {CpuUsage, CpuUsageResponse} from '../../../shared/types/cpu-usage';
 import {allCollectionSizes, allCollectionSpread, allCpuUsage} from '../gateway/backend';
 import {randomName} from '../util/name-generator';
+import chroma from "chroma-js";
 function unpack(rows: any, key: any) {
   return rows.map(function (row: any) {return row[key]});
 }
@@ -115,7 +116,7 @@ export const TreeMap = () => {
                   values: unpack(final, 'cpuusage'),
                   type: 'treemap',
                   branchvalues: 'remainder',
-                  maxdepth: 3,
+                  maxdepth: 2,
                 },
               ]
             }

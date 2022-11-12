@@ -49,6 +49,7 @@
     ]
   },
   "devDependencies": {
+    "@types/chroma-js": "^2.1.4",
     "@types/plotly.js": "^2.12.7",
     "@types/react-plotly.js": "^2.5.2"
   }
