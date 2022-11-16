@@ -219,6 +219,10 @@ instance_usage_fields = [
 
 INSERT_INSTANCE_USAGE = 'INSERT INTO instance_usage (' + ','.join(instance_usage_fields) + ') VALUES (' + ','.join(['%s'] * len(instance_usage_fields)) + ');'
 
+# Secondary tables creation
+
+CREATE_INSTANCES_PER_COLLECTION = 'CREATE TABLE instances_per_collection SELECT collection_id, COUNT(instance_index) as instance_count FROM instance_usage GROUP BY(collection_id)'
+
 # Maps for integer columns to enums
 
 machine_event_type = {
@@ -529,6 +533,10 @@ def fill_tables(db):
     fill_instance_events(db)
     fill_instance_usage(db)
 
+def create_secondary_tables(db):
+    with db.cursor() as cursor:
+        cursor.execute(CREATE_INSTANCES_PER_COLLECTION)
+
 if __name__ == '__main__':
     try:
         db = mysql.connector.connect(**db_config)
@@ -537,6 +545,7 @@ if __name__ == '__main__':
             drop_tables(db)
         create_tables(db)
         fill_tables(db)
+        create_secondary_tables(db)
 
     except Error as e:
         print("Error:", e)
