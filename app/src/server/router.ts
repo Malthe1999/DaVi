@@ -18,7 +18,11 @@ import { Machine } from "../shared/types/machine";
 import { CollectionSize } from "../shared/types/collection-size";
 import { CpuUsage } from "../shared/types/cpu-usage";
 import { CollectionSpread } from "../shared/types/collection-spread";
-import {findByCollectionId, parents} from "./repository/collection-event";
+import {
+  findByCollectionId,
+  parents,
+  uniqueCollectionIds,
+} from "./repository/collection-event";
 
 const router = express.Router();
 
@@ -175,32 +179,41 @@ router.get("/collection-spread/all", async (req: Request, res: Response) => {
   });
 });
 
-router.get(
-  "/average-cpu-per-collection",
-  async (req: Request, res: Response) =>
-    await InstanceUsageRepo.averageCpuUsagePerCollection()
-      .then((result) => {
-        res.status(200).json({ data: result });
-      })
-      .catch((err) => {
-        res.status(500).json({ errorMessage: err.message });
-      })
+router.get("/average-cpu-per-collection", async (req: Request, res: Response) =>
+  InstanceUsageRepo.averageCpuUsagePerCollection()
+    .then((result) => {
+      res.status(200).json({ data: result });
+    })
+    .catch((err) => {
+      res.status(500).json({ errorMessage: err.message });
+    })
 );
 
 router.get(
-  "/requested-instance-resources",
+  "/requested-instance-resources/:collection_ids?",
   async (req: Request, res: Response) =>
-    await requestedInstances()
+    requestedInstances(req.params["collection_ids"]?.split(",").map((x) => +x))
       .then((result) => res.status(200).json({ data: result }))
       .catch((err) => res.status(500).json({ errorMessage: err.message }))
 );
 
 router.get(
-  "/collection-parents",
-  async (req: Request, res: Response) =>
-    await parents()
+  "/collection-parents/:collection_ids?",
+  async (req: Request, res: Response) => {
+    parents(
+      req.params["collection_ids"] !== undefined
+        ? req.params["collection_ids"].split(",").map((x) => +x)
+        : []
+    )
       .then((result) => res.status(200).json({ data: result }))
-      .catch((err) => res.status(500).json({ errorMessage: err.message }))
+      .catch((err) => res.status(500).json({ errorMessage: err.message }));
+  }
+);
+
+router.get("/unique-collection-ids", async (req: Request, res: Response) =>
+  uniqueCollectionIds()
+    .then((result) => res.status(200).json({ data: result }))
+    .catch((err) => res.status(500).json({ errorMessage: err.message }))
 );
 
 export { router };
