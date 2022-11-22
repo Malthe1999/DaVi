@@ -221,7 +221,7 @@ INSERT_INSTANCE_USAGE = 'INSERT INTO instance_usage (' + ','.join(instance_usage
 
 # Secondary tables creation
 
-CREATE_INSTANCES_PER_COLLECTION = 'CREATE TABLE instances_per_collection SELECT collection_id, COUNT(instance_index) as instance_count FROM instance_usage GROUP BY(collection_id)'
+CREATE_INSTANCES_PER_COLLECTION = 'CREATE TABLE instances_per_collection SELECT collection_id, COUNT(DISTINCT(instance_index)) as instance_count FROM instance_usage GROUP BY(collection_id)'
 
 # Maps for integer columns to enums
 
