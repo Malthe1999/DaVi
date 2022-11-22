@@ -6,7 +6,7 @@ import { CollectionSpread } from "../../shared/types/collection-spread";
 export const allCpuUsage = (callback: any) => {
   const queryString = `
     SELECT CONCAT(iu.collection_id, iu.instance_index) as id,
-     iu.collection_id as colid, SUM(iu.average_cpu*(iu.end_time - iu.start_time)) as cpuusage 
+     iu.collection_id as colid, SUM(iu.average_cpu*(iu.end_time - iu.start_time)) as cpuusage, 1 as tempval
      FROM instance_usage as iu
      GROUP BY iu.collection_id, iu.instance_index`;
   db.query(queryString, (err, result) => {
@@ -24,8 +24,9 @@ export const allCpuUsage = (callback: any) => {
 
 export const allCollectionSpread = (callback: any) => {
   const queryString = `
-    SELECT DISTINCT ce.collection_id as id
-    FROM collection_events as ce`;
+    SELECT iu.collection_id as id, SUM(iu.average_cpu*(iu.end_time - iu.start_time)) as cpuusageTotal 
+    FROM instance_usage as iu
+    GROUP BY iu.collection_id`;
 
   db.query(queryString, (err, result) => {
     if (err) {

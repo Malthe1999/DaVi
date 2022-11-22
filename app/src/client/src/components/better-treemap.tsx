@@ -6,6 +6,8 @@ import {CpuUsage, CpuUsageResponse} from '../../../shared/types/cpu-usage';
 import {allCollectionSizes, allCollectionSpread, allCpuUsage} from '../gateway/backend';
 import {randomName} from '../util/name-generator';
 import chroma from "chroma-js";
+import e from 'express';
+import instanceMapping from './instance_count_per_collection.json'
 function unpack(rows: any, key: any) {
   return rows.map(function (row: any) {return row[key]});
 }
@@ -62,11 +64,23 @@ export const TreeMap = () => {
   const [data3, setData3] = useState<CpuUsageResponse>({
     data: [],
   });
+
+  const mappingArray:any = new Map(Object.entries(instanceMapping));
   var temp: CpuUsage;
   useEffect(() => {
     setIsLoading(true);
     allCpuUsage().then((value) => {
-      setData(value)
+      let tempdata1: Array<CpuUsage> = [];
+      value.data.forEach((element) => {
+        temp = {
+          cpuusage: element.cpuusage,
+          id: element.id,
+          colid: element.colid,
+          tempval: element.tempval/mappingArray.get(String(element.colid))
+        };
+        tempdata1.push(temp);
+      })
+      setData({data: tempdata1})
     }, (reason) => {
       console.log(reason)
     });
@@ -76,14 +90,16 @@ export const TreeMap = () => {
       temp = {
         cpuusage: 0,
         id: 'Total',
-        colid: ''
+        colid: '',
+        tempval: 0
       };
       data4.push(temp);
       value2.data.forEach((element) => {
         temp = {
-          cpuusage: 0,
+          cpuusage: element.cpuusageTotal,
           id: element.id,
-          colid: 'Total'
+          colid: 'Total',
+          tempval: 0
         };
           data4.push(temp);
       })
@@ -113,10 +129,11 @@ export const TreeMap = () => {
                 {
                   labels: unpack(final, 'id'),
                   parents: unpack(final, 'colid'), // no parents
-                  values: unpack(final, 'cpuusage'),
+                  values: unpack(final, 'tempval'),
                   type: 'treemap',
                   branchvalues: 'remainder',
                   maxdepth: 2,
+                  marker: {colors: unpack(final, 'cpuusage')}
                 },
               ]
             }
