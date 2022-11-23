@@ -79,6 +79,17 @@ export class Tree {
     }
   }
 
+  emphasize(node: string) {
+    let current: Node|undefined = this.pointers[node];
+    if (current === undefined) {
+      return;
+    }
+    while (current && current.gProps) {
+      current.gProps["className"] += " emphasized";
+      current = current.parent;
+    }
+  }
+
   getHighlighted() {
     const result: string[] = [];
     for (const node of Object.values(this.pointers)) {

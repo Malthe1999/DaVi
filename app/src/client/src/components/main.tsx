@@ -7,6 +7,8 @@ import { SideView } from "./side-view";
 export const Main = () => {
   const [clickedNodes, setClickedNodes] = useState<string[]>([]);
   const [filteredNodes, setFilteredNodes] = useState<string[]>([]);
+  const [currentlySelectedNode, setCurrentlySelectedNode] =
+    useState<string>("Cluster");
 
   return (
     <>
@@ -18,11 +20,15 @@ export const Main = () => {
         Borg Cluster
       </h1>
       <div className="custom-container">
-        <TreeMap></TreeMap>
+        <TreeMap
+          filteredNodes={filteredNodes}
+          setCurrentlySelectedNode={setCurrentlySelectedNode}
+        ></TreeMap>
         <SideView
           clickedNodes={clickedNodes}
           setClickedNodes={setClickedNodes}
           setFilteredNodes={setFilteredNodes}
+          currentlySelectedNode={currentlySelectedNode}
         ></SideView>
       </div>
     </>

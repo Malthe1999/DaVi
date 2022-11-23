@@ -1,8 +1,8 @@
 export interface CpuUsage {
     id: string
-    colid: string
+    parent: string
     cpuusage: number 
-    tempval: number 
+    nodeScale: number 
     color: string
 }
 export type CpuUsageResponse = {

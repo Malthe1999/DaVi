@@ -1,109 +1,82 @@
 import { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
-import { CollectionSpreadResponse } from "../../../shared/types/collection-spread";
-import { CpuUsage, CpuUsageResponse } from "../../../shared/types/cpu-usage";
+import { CpuUsage } from "../../../shared/types/cpu-usage";
 import { allCollectionSpread, allCpuUsage } from "../gateway/backend";
 import chroma from "chroma-js";
 import instanceMapping from "./instance_count_per_collection.json";
 import { unpack } from "../util/unpack";
+import { CircularProgress } from "@mui/material";
 
 const colourscale = chroma.scale("YlGnBu").domain([0, 25.8389654971]);
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-export const TreeMap = () => {
-  const [data, setData] = useState<CpuUsageResponse>({
-    data: [],
-  });
-  const [data2, setData2] = useState<CollectionSpreadResponse>({
-    data: [],
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [data3, setData3] = useState<CpuUsageResponse>({
-    data: [],
-  });
+export const TreeMap = (props: {
+  filteredNodes: string[];
+  setCurrentlySelectedNode: React.Dispatch<React.SetStateAction<string>>;
+}) => {
+  const { setCurrentlySelectedNode, filteredNodes } = props;
+  const [instanceUsage, setInstanceUsage] = useState<CpuUsage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [collectionUsage, setCollectionUsage] = useState<CpuUsage[]>([]);
   const mappingArray: any = new Map(Object.entries(instanceMapping));
-  var temp: CpuUsage;
-  useEffect(() => {
-    setIsLoading(true);
-    allCpuUsage().then(
-      (value) => {
-        let tempdata1: Array<CpuUsage> = [];
-        value.data.forEach((element) => {
-          temp = {
-            cpuusage: element.cpuusage,
-            id: element.id,
-            colid: element.colid,
-            tempval: element.tempval / mappingArray.get(String(element.colid)),
-            color: "red",
-          };
-          tempdata1.push(temp);
-        });
-        setData({ data: tempdata1 });
-      },
-      (reason) => {
-        console.log(reason);
-      }
-    );
-    allCollectionSpread().then(
-      (value2) => {
-        setData2(value2);
-        let data4: Array<CpuUsage> = [];
-        temp = {
-          cpuusage: 0,
-          id: "Total",
-          colid: "",
-          tempval: 0,
-          color: "red",
-        };
 
-        data4.push(temp);
-        value2.data.forEach((element) => {
-          temp = {
-            cpuusage: element.cpuusageTotal,
-            id: element.id,
-            colid: "Total",
-            tempval: 0,
-            color: colourscale(Math.log(element.cpuusageTotal)).hex(),
-          };
-          console.log(temp.cpuusage);
-          data4.push(temp);
-        });
-        setData3({ data: data4 });
-        setIsLoading(false);
-      },
-      (reason) => {
-        console.log(reason);
-      }
-    );
+  useEffect(() => {
+    Promise.all([
+      allCpuUsage()
+        .then((res) => {
+          let result: Array<CpuUsage> = [];
+          res.data.forEach((element) => {
+            result.push({
+              cpuusage: element.cpuusage,
+              id: element.id,
+              parent: element.parent,
+              nodeScale: 1 / mappingArray.get(String(element.parent)),
+              color: "red",
+            });
+          });
+          setInstanceUsage(result);
+        })
+        .catch((err) => console.log(err)),
+      allCollectionSpread()
+        .then((res) => {
+          let result: Array<CpuUsage> = [
+            {
+              cpuusage: 0,
+              id: "Cluster",
+              parent: "",
+              nodeScale: 0,
+              color: "red",
+            },
+          ];
+          res.data.forEach((element) => {
+            result.push({
+              cpuusage: element.cpuusageTotal,
+              id: element.id,
+              parent: "Cluster",
+              nodeScale: 0,
+              color: colourscale(Math.log(element.cpuusageTotal)).hex(),
+            });
+          });
+          setCollectionUsage(result);
+          setIsLoading(false);
+        })
+        .catch((err) => console.log(err)),
+    ]);
   }, []);
 
-  if (data == undefined || data3 == undefined) {
-    return <></>;
-    // const [instanceResources, setData] = useState<RequestedInstanceResources[]>(
-    //   []
-    // );
-    // const [parents, setParents] = useState<Parent[]>([]);
-    // const [allParents, setAllParents] = useState<Parent[]>([]);
-    // const [collectionIds, setCollectionIds] = useState<number[]>([]);
-    // const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([
-    //   319956351863,
-    // ]);
-    // const [isLoading, setIsLoading] = useState(true);
-    // if (allParents?.[0]?.parent_collection_id) {
-    //   console.log(1)
-  }
+  // const [instanceResources, setData] = useState<RequestedInstanceResources[]>(
+  //   []
+  // );
+  // const [parents, setParents] = useState<Parent[]>([]);
+  // const [allParents, setAllParents] = useState<Parent[]>([]);
+  // const [collectionIds, setCollectionIds] = useState<number[]>([]);
+  // const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([
+  //   319956351863,
+  // ]);
+  // const [isLoading, setIsLoading] = useState(true);
+  // if (allParents?.[0]?.parent_collection_id) {
+  //   console.log(1)
 
-  let final = [...data.data, ...data3.data];
+  let final = [...instanceUsage, ...collectionUsage];
   // useEffect(() => {
   //   Promise.all([
   //     requestedInstanceResources(selectedCollectionIds)
@@ -179,14 +152,14 @@ export const TreeMap = () => {
   return (
     <>
       {isLoading ? (
-        <div>...Loading</div>
+        <CircularProgress />
       ) : (
         <Plot
           data={[
             {
               labels: unpack(final, "id"),
-              parents: unpack(final, "colid"), // no parents
-              values: unpack(final, "tempval"),
+              parents: unpack(final, "parent"), // no parents
+              values: unpack(final, "nodeScale"),
               type: "treemap",
               branchvalues: "remainder",
               maxdepth: 2,
@@ -204,35 +177,13 @@ export const TreeMap = () => {
               pad: 0,
             },
           }}
+          // onUpdate={(x) => {
+          //   setCurrentlySelectedNode(((x.data[0] as any)['level'] ?? 'Cluster').toString());
+          //   console.log(((x.data[0] as any)['level'] ?? 'Cluster').toString());
+          // }}
         />
       )}
-      {/* <FormControl sx={{ m: 1, width: 300 }}>
-        <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
-        <Select
-          multiple
-          value={selectedCollectionIds}
-          onChange={(event: SelectChangeEvent<typeof selectedCollectionIds>) => {
-            const {
-              target: { value },
-            } = event;
-            setSelectedCollectionIds(
-              typeof value === "string"
-                ? value.split(",").map((x) => +x)
-                : value
-            );
-          }}
-          input={<OutlinedInput label="Tag" />}
-          renderValue={(selected) => selected.join(", ")}
-          MenuProps={MenuProps}
-        >
-          {collectionIds.map((x) => (
-            <MenuItem key={x} value={x}>
-              <Checkbox checked={selectedCollectionIds.indexOf(x) > -1} />
-              <ListItemText primary={x} />
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      {/* 
       <Plot
         data={[
           {

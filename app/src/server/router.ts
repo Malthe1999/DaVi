@@ -160,6 +160,7 @@ router.get("/collection-size/all", async (req: Request, res: Response) => {
     }
   );
 });
+
 router.get("/cpu-usage/all", async (req: Request, res: Response) => {
   CpuUsageRepo.allCpuUsage((err: Error, result: CpuUsage[]) => {
     if (err) {
@@ -169,6 +170,7 @@ router.get("/cpu-usage/all", async (req: Request, res: Response) => {
     res.status(200).json({ data: result });
   });
 });
+
 router.get("/collection-spread/all", async (req: Request, res: Response) => {
   CpuUsageRepo.allCollectionSpread((err: Error, result: CollectionSpread[]) => {
     if (err) {

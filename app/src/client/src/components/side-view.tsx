@@ -10,8 +10,9 @@ export const SideView = (props: {
   clickedNodes: string[];
   setClickedNodes: React.Dispatch<React.SetStateAction<string[]>>;
   setFilteredNodes: React.Dispatch<React.SetStateAction<string[]>>;
+  currentlySelectedNode: string;
 }) => {
-  const { clickedNodes, setClickedNodes, setFilteredNodes } = props;
+  const { clickedNodes, setClickedNodes, setFilteredNodes, currentlySelectedNode } = props;
   const [tree, setTree] = useState(new Tree("Cluster"));
   const [parents, setParents] = useState(new Array<Parent>());
 
@@ -40,7 +41,7 @@ export const SideView = (props: {
           if (!clickedNodes.includes(child)) {
             setClickedNodes([...clickedNodes, child]);
           } else {
-            setClickedNodes([...clickedNodes.filter((x) => x != child)]);
+            setClickedNodes([...clickedNodes.filter((x) => x !== child)]);
           }
         }
       );
@@ -48,9 +49,10 @@ export const SideView = (props: {
 
     // Highlight all nodes on a path from the root to a clicked node
     newTree.highlightParents();
+    newTree.emphasize(currentlySelectedNode)
     setFilteredNodes(newTree.getHighlighted().filter((x) => x != "Cluster"));
     setTree(newTree);
-  }, [clickedNodes, parents]);
+  }, [clickedNodes, parents, currentlySelectedNode]);
 
   return (
     <div className="custom-container">

@@ -8,15 +8,22 @@ div.custom-container > * {
 }
 
 svg.custom .node circle {
-	fill: green;
-	stroke: green;
-	stroke-width: 5px;
+	fill: #2b4a28;
+	stroke: #2b4a28;
+	stroke-width: 2px;
 }
 
 svg.custom .highlighted circle {
-	fill: red;
+	fill: #1fed0c;
+	stroke: #1fed0c;
+	stroke-width: 2px;
+	width: 150%;
+	height: 150%;
+}
+
+svg.custom .emphasized circle {
 	stroke: red;
-	stroke-width: 7px;
+	stroke-width: 6px;
 }
 
 svg.custom .node text {
