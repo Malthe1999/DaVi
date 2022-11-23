@@ -1,8 +1,8 @@
-import { db } from "../db";
+import { db, dbAsync } from "../db";
 import { RowDataPacket } from "mysql2";
-import { CollectionEvent } from "../../shared/types/collection-event";
+import { CollectionEvent, Parent } from "../../shared/types/collection-event";
 
-export const findByCollectionId = (id: number, callback: any) => {
+const findByCollectionId = (id: number, callback: any) => {
   const queryString = `
     SELECT *
     FROM collection_events as t
@@ -21,22 +21,46 @@ export const findByCollectionId = (id: number, callback: any) => {
   });
 };
 
-export const parents = async () => {
-  const queryString = `
-    SELECT collection_id, SUM(average_cpu)/COUNT(*) as average_cpu
-    FROM instance_usage
-    GROUP BY collection_id`;
+const parents = async (collection_ids: number[]) => {
+  let queryString = "";
+  if (collection_ids.length) {
+    queryString = `
+      SELECT parent_collection_id, collection_id
+      FROM collection_events
+      GROUP BY parent_collection_id, collection_id
+      HAVING collection_id IN (${Array(collection_ids.length)
+        .fill("?")
+        .join(",")})`;
+  } else {
+    queryString = `
+      SELECT parent_collection_id, collection_id
+      FROM collection_events
+      GROUP BY parent_collection_id, collection_id`;
+  }
 
-  return await dbAsync()
+  return dbAsync()
     .then((db) =>
       db
-        .query(queryString)
-        .then((res) =>
-          (res[0] as RowDataPacket[]).map(
-            (x: any) => x as AverageCpuUsagePerCollection
-          )
-        )
+        .query(queryString, collection_ids)
+        .then((res) => (res[0] as RowDataPacket[]).map((x: any) => x as Parent))
         .catch((err) => err)
     )
     .catch((err) => err);
 };
+
+const uniqueCollectionIds = async () => {
+  const queryString = `
+    SELECT UNIQUE(collection_id)
+    FROM collection_events`;
+
+  return dbAsync()
+    .then((db) =>
+      db
+        .query(queryString)
+        .then((res) => (res[0] as RowDataPacket[]).map((x: any) => x as Parent))
+        .catch((err) => err)
+    )
+    .catch((err) => err);
+};
+
+export { parents, findByCollectionId, uniqueCollectionIds };

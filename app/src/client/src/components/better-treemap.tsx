@@ -1,59 +1,24 @@
 import {useEffect, useState} from 'react';
 import Plot from 'react-plotly.js';
-import {CollectionSizeResponse} from '../../../shared/types/collection-size';
 import {CollectionSpreadResponse} from '../../../shared/types/collection-spread';
 import {CpuUsage, CpuUsageResponse} from '../../../shared/types/cpu-usage';
-import {allCollectionSizes, allCollectionSpread, allCpuUsage} from '../gateway/backend';
-import {randomName} from '../util/name-generator';
+import {allCollectionSpread, allCpuUsage} from '../gateway/backend';
 import chroma from "chroma-js";
-import e from 'express';
 import instanceMapping from './instance_count_per_collection.json'
 
 const colourscale = chroma.scale('YlGnBu').domain([0,25.8389654971])
-function unpack(rows: any, key: any) {
-  return rows.map(function (row: any) {return row[key]});
-}
+import { unpack } from "../util/unpack";
 
-export const TreeMapNot = () => {
-  const [data, setData] = useState<CollectionSizeResponse>({
-    data: [],
-  });
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    setIsLoading(true);
-    allCollectionSizes().then((value) => {
-      setData(value)
-      setIsLoading(false);
-    }, (reason) => {
-      console.log(reason)
-    });
-  }, []);
-
-  return (
-    <>
-      {
-        isLoading ? (
-          <div>...Loading</div >
-        ) : (
-          <Plot
-            data={
-              [
-                {
-                  labels: data.data.map(x => randomName(x.name)),
-                  parents: data.data.map(x => ''), // no parents
-                  values: data.data.map(x => x.size),
-                  type: 'treemap',
-                },
-              ]
-            }
-            layout={{width: 1200, height: 800, title: 'TODO: Change this title'}}
-          />
-        )
-      }
-    </>
-  )
-}
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 export const TreeMap = () => {
   const [data, setData] = useState<CpuUsageResponse>({
@@ -118,9 +83,93 @@ export const TreeMap = () => {
 
   if (data == undefined || data3 == undefined) {
     return (<></>);
+  // const [instanceResources, setData] = useState<RequestedInstanceResources[]>(
+  //   []
+  // );
+  // const [parents, setParents] = useState<Parent[]>([]);
+  // const [allParents, setAllParents] = useState<Parent[]>([]);
+  // const [collectionIds, setCollectionIds] = useState<number[]>([]);
+  // const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([
+  //   319956351863,
+  // ]);
+  // const [isLoading, setIsLoading] = useState(true);
+  // if (allParents?.[0]?.parent_collection_id) {
+  //   console.log(1)
   }
 
   let final = [...data.data, ...data3.data];
+  // useEffect(() => {
+  //   Promise.all([
+  //     requestedInstanceResources(selectedCollectionIds)
+  //       .then((x) => setData(x as RequestedInstanceResources[]))
+  //       .catch((err) => console.log(err)),
+  //     collectionParents(selectedCollectionIds)
+  //       .then((x) => setParents(x as Parent[]))
+  //       .catch((err) => console.log(err)),
+  //     collectionParents()
+  //       .then((x) => setAllParents(x as Parent[]))
+  //       .catch((err) => console.log(err)),
+  //     uniqueCollectionIds()
+  //       .then((x) =>
+  //         setCollectionIds((x as CollectionId[]).map((x) => x.collection_id))
+  //       )
+  //       .catch((err) => console.log(err)),
+  //   ]).finally(() => setIsLoading(false));
+  // }, [selectedCollectionIds]);
+
+  // const totalColor = "red";
+  // const nodeColor = "blue";
+  // const leafColor = "green";
+  // const machineColor = "yellow";
+  // const instanceColor = "pink";
+  // let tree = [{ parent: "", child: "Total", weight: 1, color: totalColor }];
+  // tree.push();
+
+  // let hasChildren = new Set();
+  // for (let x of parents) {
+  //   hasChildren.add(x.parent_collection_id);
+  // }
+
+  // for (let x of parents) {
+  //   tree.push({
+  //     parent:
+  //       x.parent_collection_id == null
+  //         ? "Total"
+  //         : x.parent_collection_id.toString(),
+  //     child: x.collection_id.toString(),
+  //     weight: 1,
+  //     color: hasChildren.has(x.collection_id) ? nodeColor : leafColor,
+  //   });
+  // }
+
+  // const unspecifiedMachines = new Set();
+  // for (let x of instanceResources) {
+  //   if (unspecifiedMachines.has(`${x.collection_id}.${x.machine_id}`)) {
+  //     continue;
+  //   }
+
+  //   unspecifiedMachines.add(`${x.collection_id}.${x.machine_id}`);
+  //   tree.push({
+  //     parent: `${x.collection_id}`,
+  //     child: `${x.collection_id}_${x.machine_id}`,
+  //     weight: 1,
+  //     color: machineColor,
+  //   });
+  // }
+
+  // for (let x of instanceResources) {
+  //   tree.push({
+  //     parent: `${x.collection_id}_${x.machine_id}`,
+  //     child: `${x.collection_id}.${x.machine_id}.${x.instance_index}`,
+  //     weight: 1,
+  //     color: instanceColor,
+  //   });
+  // }
+
+  // if (isLoading) {
+  //   return <div>Loading</div>;
+  // }
+
   return (
     <>
       {
@@ -145,6 +194,53 @@ export const TreeMap = () => {
           />
         )
       }
+      {/* <FormControl sx={{ m: 1, width: 300 }}>
+        <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
+        <Select
+          multiple
+          value={selectedCollectionIds}
+          onChange={(event: SelectChangeEvent<typeof selectedCollectionIds>) => {
+            const {
+              target: { value },
+            } = event;
+            setSelectedCollectionIds(
+              typeof value === "string"
+                ? value.split(",").map((x) => +x)
+                : value
+            );
+          }}
+          input={<OutlinedInput label="Tag" />}
+          renderValue={(selected) => selected.join(", ")}
+          MenuProps={MenuProps}
+        >
+          {collectionIds.map((x) => (
+            <MenuItem key={x} value={x}>
+              <Checkbox checked={selectedCollectionIds.indexOf(x) > -1} />
+              <ListItemText primary={x} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <Plot
+        data={[
+          {
+            labels: unpack(tree, "child"),
+            parents: unpack(tree, "parent"),
+            values: unpack(tree, "weight"),
+            marker: {
+              colors: unpack(tree, "color"),
+            },
+            type: "treemap",
+            branchvalues: "remainder",
+            maxdepth: 2,
+          },
+        ]}
+        layout={{
+          width: 1200,
+          height: 800,
+          title: "TODO: Change this title",
+        }}
+      /> */}
     </>
-  )
-}
+  );
+};

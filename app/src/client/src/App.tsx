@@ -1,14 +1,12 @@
-import './App.css';
-import {TreeMap} from './components/better-treemap';
-import { TreeMapwSlider } from './components/treemap-with-slider';
+import "./App.css";
+import { TreeMap } from "./components/better-treemap";
+import { SideView } from "./components/side-view";
 
-const App = () => {
+export const App = () => {
   return (
     <>
       <TreeMap></TreeMap>
-      <TreeMapwSlider></TreeMapwSlider>
+      <SideView></SideView>
     </>
   );
-}
-
-export default App;
+};

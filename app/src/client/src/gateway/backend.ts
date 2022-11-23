@@ -1,4 +1,4 @@
-import { CollectionEventResponse } from "../../../shared/types/collection-event";
+import { CollectionEventResponse, CollectionId, Parent } from "../../../shared/types/collection-event";
 import {
   InstanceEventResponse,
   RequestedInstanceResources,
@@ -86,8 +86,20 @@ export const averageCpuUsagePerCollection =
     return getData<any>("average-cpu-per-collection");
   };
 
-export const requestedInstanceResources = async () => {
-  return getData<any>("requested-instance-resources")
+export const requestedInstanceResources = async (collection_ids: number[]) => {
+  return getData<any>("requested-instance-resources/" + collection_ids.join(','))
     .then((res) => res.data as Array<RequestedInstanceResources>)
+    .catch((err) => err as Error);
+};
+
+export const collectionParents = async (collection_ids?: number[]) => {
+  return getData<any>("collection-parents/" + (collection_ids? collection_ids.join(',') : '' ))
+    .then((res) => res.data as Array<Parent>)
+    .catch((err) => err as Error);
+};
+
+export const uniqueCollectionIds = async () => {
+  return getData<any>("unique-collection-ids")
+    .then((res) => res.data as Array<CollectionId>)
     .catch((err) => err as Error);
 };

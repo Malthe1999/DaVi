@@ -43,16 +43,27 @@ export const findByCollectionId = (id: number, callback: any) => {
   });
 };
 
-const requestedInstances = async () => {
-  const queryString = `
-    SELECT collection_id, machine_id, instance_index, avg(requested_cpu) as requested_cpu, avg(requested_mem) as requested_mem
-    FROM instance_events
-    GROUP BY collection_id, machine_id, instance_index`;
+const requestedInstances = async (collection_ids: number[]) => {
+  let queryString = "";
+  if (collection_ids) {
+    queryString = `
+      SELECT collection_id, machine_id, instance_index, avg(requested_cpu) as requested_cpu, avg(requested_mem) as requested_mem
+      FROM instance_events
+      GROUP BY collection_id, machine_id, instance_index
+      HAVING collection_id IN (${Array(collection_ids.length)
+        .fill("?")
+        .join(",")})`;
+  } else {
+    queryString = `
+      SELECT collection_id, machine_id, instance_index, avg(requested_cpu) as requested_cpu, avg(requested_mem) as requested_mem
+      FROM instance_events
+      GROUP BY collection_id, machine_id, instance_index`;
+  }
 
-  return await dbAsync()
+  return dbAsync()
     .then((db) =>
       db
-        .query(queryString)
+        .query(queryString, collection_ids)
         .then((res) =>
           (res[0] as RowDataPacket[]).map(
             (x) => x as RequestedInstanceResources

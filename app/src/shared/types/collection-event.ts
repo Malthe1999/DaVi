@@ -21,3 +21,12 @@ export interface CollectionEvent {
 export type CollectionEventResponse = {
     data: CollectionEvent[]
 }
+
+export type Parent = {
+    parent_collection_id: number
+    collection_id: number
+}
+
+export type CollectionId = {
+    collection_id: number
+}
