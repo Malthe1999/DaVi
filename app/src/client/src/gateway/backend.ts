@@ -93,9 +93,9 @@ export const requestedInstanceResources = async (collection_ids: number[]) => {
 };
 
 export const collectionParents = async (collection_ids?: number[]) => {
-  return getData<any>("collection-parents/" + (collection_ids? collection_ids.join(',') : '' ))
-    .then((res) => res.data as Array<Parent>)
-    .catch((err) => err as Error);
+  return getData<{data: Parent[]}>("collection-parents/" + (collection_ids? collection_ids.join(',') : '' ))
+    .then((res) => Promise.resolve(res.data as Parent[]))
+    .catch((err) => Promise.reject(err as Error));
 };
 
 export const uniqueCollectionIds = async () => {

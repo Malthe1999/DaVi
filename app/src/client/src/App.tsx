@@ -1,12 +1,11 @@
 import "./App.css";
 import { TreeMap } from "./components/better-treemap";
-import { SideView } from "./components/side-view";
+import { Main } from "./components/main";
 
 export const App = () => {
   return (
     <>
-      <TreeMap></TreeMap>
-      <SideView></SideView>
+      <Main></Main>
     </>
   );
 };

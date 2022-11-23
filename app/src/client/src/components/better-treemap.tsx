@@ -1,13 +1,13 @@
-import {useEffect, useState} from 'react';
-import Plot from 'react-plotly.js';
-import {CollectionSpreadResponse} from '../../../shared/types/collection-spread';
-import {CpuUsage, CpuUsageResponse} from '../../../shared/types/cpu-usage';
-import {allCollectionSpread, allCpuUsage} from '../gateway/backend';
+import { useEffect, useState } from "react";
+import Plot from "react-plotly.js";
+import { CollectionSpreadResponse } from "../../../shared/types/collection-spread";
+import { CpuUsage, CpuUsageResponse } from "../../../shared/types/cpu-usage";
+import { allCollectionSpread, allCpuUsage } from "../gateway/backend";
 import chroma from "chroma-js";
-import instanceMapping from './instance_count_per_collection.json'
-
-const colourscale = chroma.scale('YlGnBu').domain([0,25.8389654971])
+import instanceMapping from "./instance_count_per_collection.json";
 import { unpack } from "../util/unpack";
+
+const colourscale = chroma.scale("YlGnBu").domain([0, 25.8389654971]);
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -31,70 +31,76 @@ export const TreeMap = () => {
   const [data3, setData3] = useState<CpuUsageResponse>({
     data: [],
   });
-  const mappingArray:any = new Map(Object.entries(instanceMapping));
+  const mappingArray: any = new Map(Object.entries(instanceMapping));
   var temp: CpuUsage;
   useEffect(() => {
     setIsLoading(true);
-    allCpuUsage().then((value) => {
-      let tempdata1: Array<CpuUsage> = [];
-      value.data.forEach((element) => {
+    allCpuUsage().then(
+      (value) => {
+        let tempdata1: Array<CpuUsage> = [];
+        value.data.forEach((element) => {
+          temp = {
+            cpuusage: element.cpuusage,
+            id: element.id,
+            colid: element.colid,
+            tempval: element.tempval / mappingArray.get(String(element.colid)),
+            color: "red",
+          };
+          tempdata1.push(temp);
+        });
+        setData({ data: tempdata1 });
+      },
+      (reason) => {
+        console.log(reason);
+      }
+    );
+    allCollectionSpread().then(
+      (value2) => {
+        setData2(value2);
+        let data4: Array<CpuUsage> = [];
         temp = {
-          cpuusage: element.cpuusage,
-          id: element.id,
-          colid: element.colid,
-          tempval: element.tempval/mappingArray.get(String(element.colid)),
-          color: 'red'
-        };
-        tempdata1.push(temp);
-      })
-      setData({data: tempdata1})
-    }, (reason) => {
-      console.log(reason)
-    });
-    allCollectionSpread().then((value2) => {
-      setData2(value2)
-      let data4: Array<CpuUsage> = [];
-      temp = {
-        cpuusage: 0,
-        id: 'Total',
-        colid: '',
-        tempval: 0,
-        color: 'red'
-      };
-      
-      data4.push(temp);
-      value2.data.forEach((element) => {
-        temp = {
-          cpuusage: element.cpuusageTotal,
-          id: element.id,
-          colid: 'Total',
+          cpuusage: 0,
+          id: "Total",
+          colid: "",
           tempval: 0,
-          color: colourscale(Math.log(element.cpuusageTotal)).hex()
+          color: "red",
         };
-          console.log(temp.cpuusage)
+
+        data4.push(temp);
+        value2.data.forEach((element) => {
+          temp = {
+            cpuusage: element.cpuusageTotal,
+            id: element.id,
+            colid: "Total",
+            tempval: 0,
+            color: colourscale(Math.log(element.cpuusageTotal)).hex(),
+          };
+          console.log(temp.cpuusage);
           data4.push(temp);
-      })
-      setData3({data: data4})
-      setIsLoading(false);
-    }, (reason) => {
-      console.log(reason)
-    });
+        });
+        setData3({ data: data4 });
+        setIsLoading(false);
+      },
+      (reason) => {
+        console.log(reason);
+      }
+    );
   }, []);
 
   if (data == undefined || data3 == undefined) {
-    return (<></>);
-  // const [instanceResources, setData] = useState<RequestedInstanceResources[]>(
-  //   []
-  // );
-  // const [parents, setParents] = useState<Parent[]>([]);
-  // const [allParents, setAllParents] = useState<Parent[]>([]);
-  // const [collectionIds, setCollectionIds] = useState<number[]>([]);
-  // const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([
-  //   319956351863,
-  // ]);
-  // const [isLoading, setIsLoading] = useState(true);
-  // if (allParents?.[0]?.parent_collection_id) {
-  //   console.log(1)
+    return <></>;
+    // const [instanceResources, setData] = useState<RequestedInstanceResources[]>(
+    //   []
+    // );
+    // const [parents, setParents] = useState<Parent[]>([]);
+    // const [allParents, setAllParents] = useState<Parent[]>([]);
+    // const [collectionIds, setCollectionIds] = useState<number[]>([]);
+    // const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([
+    //   319956351863,
+    // ]);
+    // const [isLoading, setIsLoading] = useState(true);
+    // if (allParents?.[0]?.parent_collection_id) {
+    //   console.log(1)
   }
 
   let final = [...data.data, ...data3.data];
@@ -172,28 +178,34 @@ export const TreeMap = () => {
 
   return (
     <>
-      {
-        isLoading ? (
-          <div>...Loading</div >
-        ) : (
-          <Plot
-            data={
-              [
-                {
-                  labels: unpack(final, 'id'),
-                  parents: unpack(final, 'colid'), // no parents
-                  values: unpack(final, 'tempval'),
-                  type: 'treemap',
-                  branchvalues: 'remainder',
-                  maxdepth: 2,
-                  marker: {colors: unpack(final, 'color')}
-                },
-              ]
-            }
-            layout={{width: 1200, height: 800, title: 'TODO: Change this title'}}
-          />
-        )
-      }
+      {isLoading ? (
+        <div>...Loading</div>
+      ) : (
+        <Plot
+          data={[
+            {
+              labels: unpack(final, "id"),
+              parents: unpack(final, "colid"), // no parents
+              values: unpack(final, "tempval"),
+              type: "treemap",
+              branchvalues: "remainder",
+              maxdepth: 2,
+              marker: { colors: unpack(final, "color") },
+            },
+          ]}
+          layout={{
+            width: 800,
+            height: 800,
+            margin: {
+              b: 0,
+              l: 0,
+              r: 0,
+              t: 0,
+              pad: 0,
+            },
+          }}
+        />
+      )}
       {/* <FormControl sx={{ m: 1, width: 300 }}>
         <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
         <Select

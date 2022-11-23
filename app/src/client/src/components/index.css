@@ -3,6 +3,10 @@ div.custom-container {
 	padding: 20px;
 }
 
+div.custom-container > * {
+	float: left;
+}
+
 svg.custom .node circle {
 	fill: green;
 	stroke: green;
