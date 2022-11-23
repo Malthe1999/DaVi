@@ -8,6 +8,8 @@ import {randomName} from '../util/name-generator';
 import chroma from "chroma-js";
 import e from 'express';
 import instanceMapping from './instance_count_per_collection.json'
+
+const colourscale = chroma.scale('YlGnBu').domain([0,25.8389654971])
 function unpack(rows: any, key: any) {
   return rows.map(function (row: any) {return row[key]});
 }
@@ -64,7 +66,6 @@ export const TreeMap = () => {
   const [data3, setData3] = useState<CpuUsageResponse>({
     data: [],
   });
-
   const mappingArray:any = new Map(Object.entries(instanceMapping));
   var temp: CpuUsage;
   useEffect(() => {
@@ -76,7 +77,8 @@ export const TreeMap = () => {
           cpuusage: element.cpuusage,
           id: element.id,
           colid: element.colid,
-          tempval: element.tempval/mappingArray.get(String(element.colid))
+          tempval: element.tempval/mappingArray.get(String(element.colid)),
+          color: 'red'
         };
         tempdata1.push(temp);
       })
@@ -91,16 +93,20 @@ export const TreeMap = () => {
         cpuusage: 0,
         id: 'Total',
         colid: '',
-        tempval: 0
+        tempval: 0,
+        color: 'red'
       };
+      
       data4.push(temp);
       value2.data.forEach((element) => {
         temp = {
           cpuusage: element.cpuusageTotal,
           id: element.id,
           colid: 'Total',
-          tempval: 0
+          tempval: 0,
+          color: colourscale(Math.log(element.cpuusageTotal)).hex()
         };
+          console.log(temp.cpuusage)
           data4.push(temp);
       })
       setData3({data: data4})
@@ -115,8 +121,6 @@ export const TreeMap = () => {
   }
 
   let final = [...data.data, ...data3.data];
-  console.log(final)
-
   return (
     <>
       {
@@ -133,7 +137,7 @@ export const TreeMap = () => {
                   type: 'treemap',
                   branchvalues: 'remainder',
                   maxdepth: 2,
-                  marker: {colors: unpack(final, 'cpuusage')}
+                  marker: {colors: unpack(final, 'color')}
                 },
               ]
             }

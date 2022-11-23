@@ -3,6 +3,7 @@ export interface CpuUsage {
     colid: string
     cpuusage: number 
     tempval: number 
+    color: string
 }
 export type CpuUsageResponse = {
     data: CpuUsage[]
