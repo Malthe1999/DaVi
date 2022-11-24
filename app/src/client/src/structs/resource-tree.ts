@@ -1,4 +1,4 @@
-export class Tree {
+export class ResourceTree {
   root: Node;
   pointers: { [key: string]: Node };
 
@@ -7,47 +7,17 @@ export class Tree {
       name: rootName,
       parent: undefined,
       children: [],
-      gProps: {
-        className: "custom node",
-      },
     };
     this.pointers = {};
     this.pointers[rootName] = this.root;
   }
 
-  insert(parent: string | any, child: string) {
-    if (this.pointers[parent] === undefined) {
-      throw new Error("cannot insert node in tree for nonexistent parent");
-    }
-    if (this.pointers[child] !== undefined) {
-      return;
-    }
-
-    if (!parent) {
-      parent = "";
-    }
-
-    const childNode: Node = {
-      name: child,
-      parent: this.pointers[parent],
-      children: [],
-    };
-    this.pointers[parent].children.push(childNode);
-  }
-
-  addEdge(parent: string, child: string, highlighted: boolean, onClick: any) {
+  addEdge(parent: string, child: string) {
     if (this.pointers[child] === undefined) {
       this.pointers[child] = {
         name: child,
         parent: undefined,
         children: [],
-        highlighted: highlighted,
-        gProps: {
-          className: highlighted ? "custom node highlighted" : "custom node",
-          onClick: () => {
-            onClick(child);
-          },
-        },
       };
     }
 

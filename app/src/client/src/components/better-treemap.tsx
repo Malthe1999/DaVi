@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
 import { CpuUsage } from "../../../shared/types/cpu-usage";
-import { allCollectionSpread, allCpuUsage } from "../gateway/backend";
+import {
+  allCollectionSpread,
+  allCpuUsage,
+  cpuResources,
+} from "../gateway/backend";
 import chroma from "chroma-js";
 import instanceMapping from "./instance_count_per_collection.json";
 import { unpack } from "../util/unpack";
 import { CircularProgress } from "@mui/material";
+import { ResourceTree } from "../structs/resource-tree";
+import { ResourceUsage } from "../../../shared/types/resource-usage";
 
 const colourscale = chroma.scale("YlGnBu").domain([0, 25.8389654971]);
 
@@ -14,53 +20,62 @@ export const TreeMap = (props: {
   setCurrentlySelectedNode: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const { setCurrentlySelectedNode, filteredNodes } = props;
-  const [instanceUsage, setInstanceUsage] = useState<CpuUsage[]>([]);
+  // const [instanceUsage, setInstanceUsage] = useState<CpuUsage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [collectionUsage, setCollectionUsage] = useState<CpuUsage[]>([]);
+  // const [collectionUsage, setCollectionUsage] = useState<CpuUsage[]>([]);
   const mappingArray: any = new Map(Object.entries(instanceMapping));
+  const final: [] = [];
 
   useEffect(() => {
     Promise.all([
-      allCpuUsage()
-        .then((res) => {
-          let result: Array<CpuUsage> = [];
-          res.data.forEach((element) => {
-            result.push({
-              cpuusage: element.cpuusage,
-              id: element.id,
-              parent: element.parent,
-              nodeScale: 1 / mappingArray.get(String(element.parent)),
-              color: "red",
-            });
-          });
-          setInstanceUsage(result);
-        })
-        .catch((err) => console.log(err)),
-      allCollectionSpread()
-        .then((res) => {
-          let result: Array<CpuUsage> = [
-            {
-              cpuusage: 0,
-              id: "Cluster",
-              parent: "",
-              nodeScale: 0,
-              color: "red",
-            },
-          ];
-          res.data.forEach((element) => {
-            result.push({
-              cpuusage: element.cpuusageTotal,
-              id: element.id,
-              parent: "Cluster",
-              nodeScale: 0,
-              color: colourscale(Math.log(element.cpuusageTotal)).hex(),
-            });
-          });
-          setCollectionUsage(result);
-          setIsLoading(false);
-        })
-        .catch((err) => console.log(err)),
-    ]);
+      cpuResources([319956351863]).then((res) => {
+        const tree = new ResourceTree("Cluster");
+        for (const x of res) {
+          tree.addEdge("Cluster", collection(x));
+          tree.addEdge(collection(x), machine(x));
+          tree.addEdge(machine(x), instance(x));
+        }
+      }),
+      // allCpuUsage()
+      //   .then((res) => {
+      //     let result: Array<CpuUsage> = [];
+      //     res.data.forEach((element) => {
+      //       result.push({
+      //         cpuusage: element.cpuusage,
+      //         id: element.id,
+      //         parent: element.parent,
+      //         nodeScale: 1 / mappingArray.get(String(element.parent)),
+      //         color: "red",
+      //       });
+      //     });
+      //     setInstanceUsage(result);
+      //   })
+      //   .catch((err) => console.log(err)),
+      // allCollectionSpread()
+      //   .then((res) => {
+      //     let result: Array<CpuUsage> = [
+      //       {
+      //         cpuusage: 0,
+      //         id: "Cluster",
+      //         parent: "",
+      //         nodeScale: 0,
+      //         color: "red",
+      //       },
+      //     ];
+      //     res.data.forEach((element) => {
+      //       result.push({
+      //         cpuusage: element.cpuusageTotal,
+      //         id: element.id,
+      //         parent: "Cluster",
+      //         nodeScale: 0,
+      //         color: colourscale(Math.log(element.cpuusageTotal)).hex(),
+      //       });
+      //     });
+      //     setCollectionUsage(result);
+      //     setIsLoading(false);
+      //   })
+      //   .catch((err) => console.log(err)),
+    ]).finally(() => setIsLoading(false));
   }, []);
 
   // const [instanceResources, setData] = useState<RequestedInstanceResources[]>(
@@ -76,7 +91,7 @@ export const TreeMap = (props: {
   // if (allParents?.[0]?.parent_collection_id) {
   //   console.log(1)
 
-  let final = [...instanceUsage, ...collectionUsage];
+  // let final = [...instanceUsage, ...collectionUsage];
   // useEffect(() => {
   //   Promise.all([
   //     requestedInstanceResources(selectedCollectionIds)
@@ -206,4 +221,14 @@ export const TreeMap = (props: {
       /> */}
     </>
   );
+};
+
+const collection = (x: ResourceUsage) => {
+  return x.collection_id;
+};
+const machine = (x: ResourceUsage) => {
+  return `${x.collection_id}-${x.machine_id}`;
+};
+const instance = (x: ResourceUsage) => {
+  return `${x.collection_id}-${x.machine_id}-${x.instance_index}`;
 };
