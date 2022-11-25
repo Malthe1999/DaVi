@@ -1,3 +1,5 @@
+import chroma from "chroma-js";
+
 export class ResourceTree {
   root: Node;
   pointers: { [key: string]: Node };
@@ -12,12 +14,13 @@ export class ResourceTree {
     this.pointers[rootName] = this.root;
   }
 
-  addEdge(parent: string, child: string) {
+  addEdge(parent: string, child: string, resourceUsage?: number) {
     if (this.pointers[child] === undefined) {
       this.pointers[child] = {
         name: child,
         parent: undefined,
         children: [],
+        resourceUsage: resourceUsage,
       };
     }
 
@@ -34,77 +37,56 @@ export class ResourceTree {
     this.pointers[child].parent = this.pointers[parent];
   }
 
-  highlightParents() {
-    for (const child of Object.keys(this.pointers)) {
-      if (this.pointers[child].highlighted) {
-        let parent = this.pointers[child].parent;
-        while (parent && parent.gProps) {
-          parent.highlighted = true;
-          parent.gProps["className"] = "custom node highlighted";
-          parent = parent.parent;
-        }
-      }
-    }
-  }
-
-  emphasize(node: string) {
-    let current: Node | undefined = this.pointers[node];
-    if (current === undefined) {
-      return;
-    }
-    while (current && current.gProps) {
-      current.gProps["className"] += " emphasized";
-      current = current.parent;
-    }
-  }
-
-  getHighlighted() {
-    const result: string[] = [];
-    for (const node of Object.values(this.pointers)) {
-      if (node.highlighted) {
-        result.push(node.name ?? "");
-      }
-    }
-    return result;
-  }
-
-  getParents(child: string) {
-    const result: string[] = [];
-    let parent = this.pointers[child].parent;
-    while (parent) {
-      result.push(parent.name ?? "");
-      parent = parent.parent;
-    }
-    return result;
-  }
-
-  calculateValues() {
+  calculateNodeSizes() {
     const stak: Array<Node> = [];
     stak.push(this.root);
-    this.root.value = 1;
-    console.log(this.root);
+    this.root.nodeSize = 1;
     while (stak.length > 0) {
       const current: Node = stak.pop()!;
       for (const child of current.children) {
-        child.value = current.value! / current.children.length;
+        child.nodeSize = current.nodeSize! / current.children.length;
         stak.push(child);
       }
       if (current.children.length > 0) {
-        current.value = 0;
+        current.nodeSize = 0;
       }
     }
   }
 
+  calculateResources(node: Node) {
+    let total = 0;
+    if (node.children.length === 0) {
+      return node.resourceUsage ?? 0;
+    }
+    for (const child of node.children) {
+      this.calculateResources(child);
+      total += child.resourceUsage ?? 0;
+    }
+    node.resourceUsage = total;
+  }
+
+  getMaxResources() {
+    let result = 0;
+    for (const child of Object.values(this.pointers)) {
+      result = Math.max(result, child.resourceUsage ?? 0);
+    }
+    return result;
+  }
+
   toDataPoints() {
-    this.calculateValues();
+    this.calculateNodeSizes();
+    this.calculateResources(this.root);
+    const colourscale = chroma
+      .scale("YlGnBu")
+      .domain([0, Math.log(this.getMaxResources())]);
 
     const result = [];
     for (const node of Object.values(this.pointers)) {
       result.push({
         label: node.name,
         parent: node.parent?.name ?? "", // Cluster has no parent
-        value: node.value, // todo
-        color: "red",
+        nodeSize: node.nodeSize,
+        color: colourscale(Math.log(node.resourceUsage!)).hex(),
       });
     }
     return result;
@@ -117,5 +99,6 @@ interface Node {
   children: Node[];
   gProps?: any;
   highlighted?: boolean;
-  value?: number;
+  nodeSize?: number;
+  resourceUsage?: number;
 }
