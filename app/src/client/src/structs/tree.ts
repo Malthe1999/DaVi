@@ -1,5 +1,3 @@
-import { getThemeProps } from "@mui/system";
-
 export class Tree {
   root: Node;
   pointers: { [key: string]: Node };

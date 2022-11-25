@@ -5,6 +5,7 @@ import {
   AverageCpuUsagePerCollectionResult,
   InstanceUsage,
 } from "../../shared/types/instance-usage";
+import { ResourceUsage } from "../../shared/types/resource-usage";
 
 export const findByMachineId = (id: number, callback: any) => {
   const queryString = `
@@ -39,6 +40,74 @@ export const averageCpuUsagePerCollection = async () => {
           (res[0] as RowDataPacket[]).map(
             (x: any) => x as AverageCpuUsagePerCollection
           )
+        )
+        .catch((err) => err)
+    )
+    .catch((err) => err);
+};
+
+export const cpuResources = async (collection_ids: number[]) => {
+  let queryString = "";
+  if (collection_ids.length > 0) {
+    queryString = `
+      SELECT collection_id, machine_id, instance_index, SUM(average_cpu*(end_time - start_time)) AS resource_usage
+      FROM instance_usage
+      GROUP BY collection_id, machine_id, instance_index
+      HAVING collection_id IN (
+        ${Array(collection_ids.length).fill("?").join(",")}
+      )`;
+  } else {
+    queryString = `
+      SELECT collection_id, machine_id, instance_index, SUM(average_cpu*(end_time - start_time)) AS resource_usage
+      FROM instance_usage
+      GROUP BY collection_id, machine_id, instance_index
+      `;
+  }
+
+  return dbAsync()
+    .then((db) =>
+      db
+        .query(queryString, collection_ids)
+        .then((res) =>
+          (res[0] as RowDataPacket[]).map(
+            (x) =>
+              new ResourceUsage(
+                x["collection_id"].toString(),
+                x["machine_id"].toString(),
+                x["instance_index"].toString(),
+                +x["resource_usage"]
+              )
+          )
+        )
+        .catch((err) => err)
+    )
+    .catch((err) => err);
+};
+
+export const memoryResources = async (collection_ids: number[]) => {
+  let queryString = "";
+  if (collection_ids.length > 0) {
+    queryString = `
+      SELECT collection_id, machine_id, instance_index, SUM(average_mem*(end_time - start_time)) AS resource_usage
+      FROM instance_usage
+      GROUP BY collection_id, machine_id, instance_index
+      HAVING collection_id IN (
+        ${Array(collection_ids.length).fill("?").join(",")}
+      )`;
+  } else {
+    queryString = `
+      SELECT collection_id, machine_id, instance_index, SUM(average_mem*(end_time - start_time)) AS resource_usage
+      FROM instance_usage
+      GROUP BY collection_id, machine_id, instance_index
+      `;
+  }
+
+  return dbAsync()
+    .then((db) =>
+      db
+        .query(queryString, collection_ids)
+        .then((res) =>
+          (res[0] as RowDataPacket[]).map((x) => x as ResourceUsage)
         )
         .catch((err) => err)
     )

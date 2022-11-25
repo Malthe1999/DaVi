@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
 import * as InstanceEventRepo from "./repository/instance-event";
 import { requestedInstances } from "./repository/instance-event";
-import * as InstanceUsageRepo from "./repository/instance-usage";
 import * as MachineAttributeRepo from "./repository/machine-attribute";
 import * as MachineEventRepo from "./repository/machine-event";
 import * as CollectionRepo from "./repository/collection";
@@ -23,6 +22,7 @@ import {
   parents,
   uniqueCollectionIds,
 } from "./repository/collection-event";
+import {averageCpuUsagePerCollection, cpuResources, findByMachineId, memoryResources} from "./repository/instance-usage";
 
 const router = express.Router();
 
@@ -81,7 +81,7 @@ router.get(
 router.get(
   "/instance-usage/machine/:id",
   async (req: Request, res: Response) => {
-    InstanceUsageRepo.findByMachineId(
+    findByMachineId(
       +req.params["id"],
       (err: Error, result: InstanceUsage[]) => {
         if (err) {
@@ -182,7 +182,7 @@ router.get("/collection-spread/all", async (req: Request, res: Response) => {
 });
 
 router.get("/average-cpu-per-collection", async (req: Request, res: Response) =>
-  InstanceUsageRepo.averageCpuUsagePerCollection()
+  averageCpuUsagePerCollection()
     .then((result) => {
       res.status(200).json({ data: result });
     })
@@ -216,6 +216,30 @@ router.get("/unique-collection-ids", async (req: Request, res: Response) =>
   uniqueCollectionIds()
     .then((result) => res.status(200).json({ data: result }))
     .catch((err) => res.status(500).json({ errorMessage: err.message }))
+);
+
+router.get(
+  "/cpu-resources/:collection_ids?",
+  async (req: Request, res: Response) => 
+    cpuResources(
+      req.params["collection_ids"] !== undefined
+        ? req.params["collection_ids"].split(",").map((x) => +x)
+        : []
+    )
+      .then((result) => res.status(200).json({ data: result }))
+      .catch((err) => res.status(500).json({ errorMessage: err.message }))
+);
+
+router.get(
+  "/memory-resources/:collection_ids?",
+  async (req: Request, res: Response) => 
+    memoryResources(
+      req.params["collection_ids"] !== undefined
+        ? req.params["collection_ids"].split(",").map((x) => +x)
+        : []
+    )
+      .then((result) => res.status(200).json({ data: result }))
+      .catch((err) => res.status(500).json({ errorMessage: err.message }))
 );
 
 export { router };

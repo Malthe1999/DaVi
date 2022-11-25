@@ -12,8 +12,9 @@ import { MachineEventResponse } from "../../../shared/types/machine-event";
 import { MachineResult } from "../../../shared/types/machine";
 import { CollectionResult } from "../../../shared/types/collection";
 import { CollectionSizeResponse } from "../../../shared/types/collection-size";
-import { CpuUsageResponse } from "../../../shared/types/cpu-usage";
+import { CpuUsage, CpuUsageResponse } from "../../../shared/types/cpu-usage";
 import { CollectionSpreadResponse } from "../../../shared/types/collection-spread";
+import { ResourceUsage } from "../../../shared/types/resource-usage";
 
 export const getData = async <T>(resource: string): Promise<T> => {
   const res = await fetch(`http://localhost:17500/api/${resource}`, {
@@ -102,4 +103,20 @@ export const uniqueCollectionIds = async () => {
   return getData<any>("unique-collection-ids")
     .then((res) => res.data as Array<CollectionId>)
     .catch((err) => err as Error);
+};
+
+export const cpuResources = async (collection_ids?: (number|string)[]) => {
+  return getData<{ data: ResourceUsage[] }>(
+    "cpu-resources/" + (collection_ids ? collection_ids.join(",") : "")
+  )
+    .then((res) => Promise.resolve(res.data))
+    .catch((err) => Promise.reject(err as Error));
+};
+
+export const memoryResources = async (collection_ids?: number[]) => {
+  return getData<{ data: ResourceUsage[] }>(
+    "memory-resources/" + (collection_ids ? collection_ids.join(",") : "")
+  )
+    .then((res) => Promise.resolve(res.data))
+    .catch((err) => Promise.reject(err as Error));
 };
