@@ -105,7 +105,7 @@ export const uniqueCollectionIds = async () => {
     .catch((err) => err as Error);
 };
 
-export const cpuResources = async (collection_ids?: number[]) => {
+export const cpuResources = async (collection_ids?: (number|string)[]) => {
   return getData<{ data: ResourceUsage[] }>(
     "cpu-resources/" + (collection_ids ? collection_ids.join(",") : "")
   )

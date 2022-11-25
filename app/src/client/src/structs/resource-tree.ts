@@ -27,7 +27,7 @@ export class ResourceTree {
         parent: undefined,
         children: [this.pointers[child]],
       };
-    } else {
+    } else if (!this.pointers[parent].children.find((x) => x.name === child)) {
       this.pointers[parent].children.push(this.pointers[child]);
     }
 
@@ -48,7 +48,7 @@ export class ResourceTree {
   }
 
   emphasize(node: string) {
-    let current: Node|undefined = this.pointers[node];
+    let current: Node | undefined = this.pointers[node];
     if (current === undefined) {
       return;
     }
@@ -77,6 +77,38 @@ export class ResourceTree {
     }
     return result;
   }
+
+  calculateValues() {
+    const stak: Array<Node> = [];
+    stak.push(this.root);
+    this.root.value = 1;
+    console.log(this.root);
+    while (stak.length > 0) {
+      const current: Node = stak.pop()!;
+      for (const child of current.children) {
+        child.value = current.value! / current.children.length;
+        stak.push(child);
+      }
+      if (current.children.length > 0) {
+        current.value = 0;
+      }
+    }
+  }
+
+  toDataPoints() {
+    this.calculateValues();
+
+    const result = [];
+    for (const node of Object.values(this.pointers)) {
+      result.push({
+        label: node.name,
+        parent: node.parent?.name ?? "", // Cluster has no parent
+        value: node.value, // todo
+        color: "red",
+      });
+    }
+    return result;
+  }
 }
 
 interface Node {
@@ -85,4 +117,5 @@ interface Node {
   children: Node[];
   gProps?: any;
   highlighted?: boolean;
+  value?: number;
 }

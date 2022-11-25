@@ -24,6 +24,9 @@ export const SideView = (props: {
   }, []);
 
   useEffect(() => {
+    if (parents.length === 0) {
+      return;
+    }
     // Update the highlighted nodes
     let newTree = new Tree("Cluster");
     for (const x of parents as Parent[]) {

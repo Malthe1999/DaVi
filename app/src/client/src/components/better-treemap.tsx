@@ -4,6 +4,7 @@ import { CpuUsage } from "../../../shared/types/cpu-usage";
 import {
   allCollectionSpread,
   allCpuUsage,
+  collectionParents,
   cpuResources,
 } from "../gateway/backend";
 import chroma from "chroma-js";
@@ -24,18 +25,27 @@ export const TreeMap = (props: {
   const [isLoading, setIsLoading] = useState(true);
   // const [collectionUsage, setCollectionUsage] = useState<CpuUsage[]>([]);
   const mappingArray: any = new Map(Object.entries(instanceMapping));
-  const final: [] = [];
+  const [dataPoints, setDataPoints] = useState<any[]>([]);
+  const [allParents, setAllParents] = useState<{ [key: string]: string }>({});
+  const [allResourceUsage, setAllResourceUsage] = useState<ResourceUsage[]>([]);
 
   useEffect(() => {
     Promise.all([
-      cpuResources([319956351863]).then((res) => {
-        const tree = new ResourceTree("Cluster");
-        for (const x of res) {
-          tree.addEdge("Cluster", collection(x));
-          tree.addEdge(collection(x), machine(x));
-          tree.addEdge(machine(x), instance(x));
+      collectionParents().then((x) => {
+        const parents: { [key: string]: string } = {};
+        for (const relationship of x) {
+          parents[relationship.collection_id.toString()] = (
+            relationship.parent_collection_id ?? "Cluster"
+          ).toString();
         }
+        setAllParents(parents);
       }),
+    ]);
+  }, []);
+
+  useEffect(() => {
+    Promise.all([
+      cpuResources(filteredNodes).then((res) => setAllResourceUsage(res)),
       // allCpuUsage()
       //   .then((res) => {
       //     let result: Array<CpuUsage> = [];
@@ -76,7 +86,17 @@ export const TreeMap = (props: {
       //   })
       //   .catch((err) => console.log(err)),
     ]).finally(() => setIsLoading(false));
-  }, []);
+  }, [filteredNodes]);
+
+  useEffect(() => {
+    const tree = new ResourceTree("Cluster");
+    for (const x of allResourceUsage) {
+      tree.addEdge(allParents[x.collection_id], collection(x));
+      tree.addEdge(collection(x), machine(x));
+      tree.addEdge(machine(x), instance(x));
+    }
+    setDataPoints(tree.toDataPoints());
+  }, [allResourceUsage, allParents]);
 
   // const [instanceResources, setData] = useState<RequestedInstanceResources[]>(
   //   []
@@ -172,13 +192,13 @@ export const TreeMap = (props: {
         <Plot
           data={[
             {
-              labels: unpack(final, "id"),
-              parents: unpack(final, "parent"), // no parents
-              values: unpack(final, "nodeScale"),
+              labels: unpack(dataPoints, "label"),
+              parents: unpack(dataPoints, "parent"), // no parents
+              values: unpack(dataPoints, "value"),
               type: "treemap",
-              branchvalues: "remainder",
-              maxdepth: 2,
-              marker: { colors: unpack(final, "color") },
+              // branchvalues: "remainder",
+              maxdepth: 4,
+              marker: { colors: unpack(dataPoints, "color") },
             },
           ]}
           layout={{
