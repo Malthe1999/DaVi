@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TreeMap } from "./better-treemap";
+import TreeMap from "./better-treemap";
 import "./index.css";
 // @ts-ignore
 import { SideView } from "./side-view";
@@ -78,6 +78,7 @@ export const Main = () => {
         <SideView
           clickedNodes={clickedNodes}
           setClickedNodes={setClickedNodes}
+          filteredNodes={filteredNodes}
           setFilteredNodes={setFilteredNodes}
           currentlySelectedNode={currentlySelectedNode}
         ></SideView>

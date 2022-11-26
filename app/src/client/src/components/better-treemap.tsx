@@ -1,18 +1,12 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import Plot from "react-plotly.js";
-import {
-  collectionParents,
-  cpuResources,
-} from "../gateway/backend";
-import chroma from "chroma-js";
+import { collectionParents, cpuResources } from "../gateway/backend";
 import { unpack } from "../util/unpack";
 import { CircularProgress } from "@mui/material";
 import { ResourceTree } from "../structs/resource-tree";
 import { ResourceUsage } from "../../../shared/types/resource-usage";
 
-const colourscale = chroma.scale("YlGnBu").domain([0, 25.8389654971]);
-
-export const TreeMap = (props: {
+const TreeMap = (props: {
   filteredNodes: string[];
   setCurrentlySelectedNode: React.Dispatch<React.SetStateAction<string>>;
 }) => {
@@ -78,10 +72,12 @@ export const TreeMap = (props: {
               pad: 0,
             },
           }}
-          // onUpdate={(x) => {
-          //   setCurrentlySelectedNode(((x.data[0] as any)['level'] ?? 'Cluster').toString());
-          //   console.log(((x.data[0] as any)['level'] ?? 'Cluster').toString());
-          // }}
+          onUpdate={(x) => {
+            setCurrentlySelectedNode((
+              (x.data[0] as any)["level"]?.split('-')[0] ?? "Cluster"
+            ).toString())
+            console.log(((x.data[0] as any)['level'] ?? 'Cluster').toString());
+          }}
         />
       )}
     </>
@@ -97,3 +93,5 @@ const machine = (x: ResourceUsage) => {
 const instance = (x: ResourceUsage) => {
   return `${x.collection_id}-${x.machine_id}-${x.instance_index}`;
 };
+
+export default memo(TreeMap);

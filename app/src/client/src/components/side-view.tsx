@@ -5,14 +5,22 @@ import "./index.css";
 // @ts-ignore
 import { Tree as TreeGraph } from "react-tree-graph";
 import { Tree } from "../structs/tree";
+import _ from "lodash";
 
 export const SideView = (props: {
   clickedNodes: string[];
+  filteredNodes: string[];
   setClickedNodes: React.Dispatch<React.SetStateAction<string[]>>;
   setFilteredNodes: React.Dispatch<React.SetStateAction<string[]>>;
   currentlySelectedNode: string;
 }) => {
-  const { clickedNodes, setClickedNodes, setFilteredNodes, currentlySelectedNode } = props;
+  const {
+    clickedNodes,
+    setClickedNodes,
+    setFilteredNodes,
+    currentlySelectedNode,
+    filteredNodes,
+  } = props;
   const [tree, setTree] = useState(new Tree("Cluster"));
   const [parents, setParents] = useState(new Array<Parent>());
 
@@ -52,8 +60,13 @@ export const SideView = (props: {
 
     // Highlight all nodes on a path from the root to a clicked node
     newTree.highlightParents();
-    newTree.emphasize(currentlySelectedNode)
-    setFilteredNodes(newTree.getHighlighted().filter((x) => x != "Cluster"));
+    newTree.emphasize(currentlySelectedNode);
+    const newFilteredNodes = newTree
+      .getHighlighted()
+      .filter((x) => x != "Cluster");
+    if (!_.isEqual(filteredNodes, newFilteredNodes)) {
+      setFilteredNodes(newTree.getHighlighted().filter((x) => x != "Cluster"));
+    }
     setTree(newTree);
   }, [clickedNodes, parents, currentlySelectedNode]);
 
