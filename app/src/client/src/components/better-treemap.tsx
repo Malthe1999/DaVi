@@ -10,8 +10,10 @@ const TreeMap = (props: {
   filteredNodes: string[];
   setCurrentlySelectedNode: React.Dispatch<React.SetStateAction<string>>;
   viewedResource: string;
+  fromTime: number;
+  toTime: number;
 }) => {
-  const { setCurrentlySelectedNode, filteredNodes, viewedResource } = props;
+  const { setCurrentlySelectedNode, filteredNodes, viewedResource, fromTime, toTime } = props;
   const [isLoading, setIsLoading] = useState(true);
   const [dataPoints, setDataPoints] = useState<any[]>([]);
   const [allParents, setAllParents] = useState<{ [key: string]: string }>({});
@@ -31,17 +33,17 @@ const TreeMap = (props: {
 
   useEffect(() => {
     if (viewedResource === "cpu") {
-      cpuResources(filteredNodes)
+      cpuResources(filteredNodes, fromTime, toTime)
         .then((res) => setAllResourceUsage(res))
         .finally(() => setIsLoading(false));
     } else if (viewedResource === "mem"){
-      memoryResources(filteredNodes)
+      memoryResources(filteredNodes, fromTime, toTime)
         .then((res) => setAllResourceUsage(res))
         .finally(() => setIsLoading(false));
     } else {
       console.log('Invalid resource type', viewedResource)
     }
-  }, [filteredNodes, viewedResource]);
+  }, [filteredNodes, viewedResource, fromTime, toTime]);
 
   useEffect(() => {
     const tree = new ResourceTree("Cluster");

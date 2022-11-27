@@ -95,6 +95,12 @@ export class Tree {
         result.push(node.name ?? "");
       }
     }
+
+    if (result.length === 0) {
+      // In case nothing is selected, select everything
+      return Object.keys(this.pointers);
+    }
+
     return result;
   }
 

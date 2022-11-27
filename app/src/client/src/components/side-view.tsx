@@ -13,6 +13,8 @@ export const SideView = (props: {
   setClickedNodes: React.Dispatch<React.SetStateAction<string[]>>;
   setFilteredNodes: React.Dispatch<React.SetStateAction<string[]>>;
   currentlySelectedNode: string;
+  fromTime: number;
+  toTime: number;
 }) => {
   const {
     clickedNodes,

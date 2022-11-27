@@ -1,4 +1,8 @@
-import { CollectionEventResponse, CollectionId, Parent } from "../../../shared/types/collection-event";
+import {
+  CollectionEventResponse,
+  CollectionId,
+  Parent,
+} from "../../../shared/types/collection-event";
 import {
   InstanceEventResponse,
   RequestedInstanceResources,
@@ -88,13 +92,17 @@ export const averageCpuUsagePerCollection =
   };
 
 export const requestedInstanceResources = async (collection_ids: number[]) => {
-  return getData<any>("requested-instance-resources/" + collection_ids.join(','))
+  return getData<any>(
+    "requested-instance-resources/" + collection_ids.join(",")
+  )
     .then((res) => res.data as Array<RequestedInstanceResources>)
     .catch((err) => err as Error);
 };
 
 export const collectionParents = async (collection_ids?: number[]) => {
-  return getData<{data: Parent[]}>("collection-parents/" + (collection_ids? collection_ids.join(',') : '' ))
+  return getData<{ data: Parent[] }>(
+    "collection-parents/" + (collection_ids ? collection_ids.join(",") : "")
+  )
     .then((res) => Promise.resolve(res.data as Parent[]))
     .catch((err) => Promise.reject(err as Error));
 };
@@ -105,17 +113,35 @@ export const uniqueCollectionIds = async () => {
     .catch((err) => err as Error);
 };
 
-export const cpuResources = async (collection_ids?: (number|string)[]) => {
+export const cpuResources = async (
+  collection_ids?: (number | string)[],
+  fromTime?: number,
+  toTime?: number
+) => {
   return getData<{ data: ResourceUsage[] }>(
-    "cpu-resources/" + (collection_ids ? collection_ids.join(",") : "")
+    "cpu-resources/" +
+      (collection_ids ? collection_ids.join(",") : "") +
+      "/" +
+      fromTime +
+      "/" +
+      toTime
   )
     .then((res) => Promise.resolve(res.data))
     .catch((err) => Promise.reject(err as Error));
 };
 
-export const memoryResources = async (collection_ids?: (number|string)[]) => {
+export const memoryResources = async (
+  collection_ids?: (number | string)[],
+  fromTime?: number,
+  toTime?: number
+) => {
   return getData<{ data: ResourceUsage[] }>(
-    "memory-resources/" + (collection_ids ? collection_ids.join(",") : "")
+    "memory-resources/" +
+      (collection_ids ? collection_ids.join(",") : "") +
+      "/" +
+      fromTime +
+      "/" +
+      toTime
   )
     .then((res) => Promise.resolve(res.data))
     .catch((err) => Promise.reject(err as Error));

@@ -1,4 +1,10 @@
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import { useState } from "react";
 import TreeMap from "./better-treemap";
 import "./index.css";
@@ -63,6 +69,8 @@ export const Main = () => {
     useState<string>("Cluster");
 
   const [viewedResource, setViewedResource] = useState<string>("cpu");
+  const [fromTime, setFromTime] = useState<number>(300000000);
+  const [toTime, setToTime] = useState<number>(2679000000000);
 
   return (
     <>
@@ -93,12 +101,28 @@ export const Main = () => {
             <MenuItem value={"cpu"}>CPU</MenuItem>
             <MenuItem value={"mem"}>RAM</MenuItem>
           </Select>
+          <TextField
+            id="outlined-basic"
+            label="From Time"
+            variant="standard"
+            value={fromTime}
+            onChange={(event) => {setFromTime(+event.target.value)}}
+          />
+          <TextField
+            id="outlined-basic"
+            label="To Time"
+            variant="standard"
+            value={toTime}
+            onChange={(event) => {setToTime(+event.target.value)}}
+          />
         </FormControl>
 
         <TreeMap
           filteredNodes={filteredNodes}
           setCurrentlySelectedNode={setCurrentlySelectedNode}
           viewedResource={viewedResource}
+          fromTime={fromTime}
+          toTime={toTime}
         ></TreeMap>
         <SideView
           clickedNodes={clickedNodes}
@@ -106,6 +130,8 @@ export const Main = () => {
           filteredNodes={filteredNodes}
           setFilteredNodes={setFilteredNodes}
           currentlySelectedNode={currentlySelectedNode}
+          fromTime={fromTime}
+          toTime={toTime}
         ></SideView>
       </div>
     </>

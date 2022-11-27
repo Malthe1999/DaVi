@@ -22,7 +22,12 @@ import {
   parents,
   uniqueCollectionIds,
 } from "./repository/collection-event";
-import {averageCpuUsagePerCollection, cpuResources, findByMachineId, memoryResources} from "./repository/instance-usage";
+import {
+  averageCpuUsagePerCollection,
+  cpuResources,
+  findByMachineId,
+  memoryResources,
+} from "./repository/instance-usage";
 
 const router = express.Router();
 
@@ -219,24 +224,32 @@ router.get("/unique-collection-ids", async (req: Request, res: Response) =>
 );
 
 router.get(
-  "/cpu-resources/:collection_ids?",
-  async (req: Request, res: Response) => 
+  "/cpu-resources/:collection_ids?/:from_time?/:to_time?",
+  async (req: Request, res: Response) =>
     cpuResources(
       req.params["collection_ids"] !== undefined
         ? req.params["collection_ids"].split(",").map((x) => +x)
-        : []
+        : [],
+      req.params["from_time"] !== "undefined"
+        ? +req.params["from_time"]
+        : undefined,
+      req.params["to_time"] !== "undefined" ? +req.params["to_time"] : undefined
     )
       .then((result) => res.status(200).json({ data: result }))
       .catch((err) => res.status(500).json({ errorMessage: err.message }))
 );
 
 router.get(
-  "/memory-resources/:collection_ids?",
-  async (req: Request, res: Response) => 
+  "/memory-resources/:collection_ids?/:from_time?/:to_time?",
+  async (req: Request, res: Response) =>
     memoryResources(
       req.params["collection_ids"] !== undefined
         ? req.params["collection_ids"].split(",").map((x) => +x)
-        : []
+        : [],
+      req.params["from_time"] !== "undefined"
+        ? +req.params["from_time"]
+        : undefined,
+      req.params["to_time"] !== "undefined" ? +req.params["to_time"] : undefined
     )
       .then((result) => res.status(200).json({ data: result }))
       .catch((err) => res.status(500).json({ errorMessage: err.message }))

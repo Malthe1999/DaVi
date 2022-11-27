@@ -46,12 +46,21 @@ export const averageCpuUsagePerCollection = async () => {
     .catch((err) => err);
 };
 
-export const cpuResources = async (collection_ids: number[]) => {
+export const cpuResources = async (
+  collection_ids: number[],
+  fromTime?: number,
+  toTime?: number
+) => {
   let queryString = "";
   if (collection_ids.length > 0) {
     queryString = `
       SELECT collection_id, machine_id, instance_index, SUM(average_cpu*(end_time - start_time)) AS resource_usage
       FROM instance_usage
+      ${
+        fromTime !== undefined && toTime !== undefined
+          ? `WHERE start_time > ${fromTime} AND end_time < ${toTime}`
+          : ""
+      }
       GROUP BY collection_id, machine_id, instance_index
       HAVING collection_id IN (
         ${Array(collection_ids.length).fill("?").join(",")}
@@ -60,6 +69,11 @@ export const cpuResources = async (collection_ids: number[]) => {
     queryString = `
       SELECT collection_id, machine_id, instance_index, SUM(average_cpu*(end_time - start_time)) AS resource_usage
       FROM instance_usage
+      ${
+        fromTime !== undefined && toTime !== undefined
+          ? `WHERE start_time > ${fromTime} AND end_time < ${toTime}`
+          : ""
+      }
       GROUP BY collection_id, machine_id, instance_index
       `;
   }
@@ -84,12 +98,21 @@ export const cpuResources = async (collection_ids: number[]) => {
     .catch((err) => err);
 };
 
-export const memoryResources = async (collection_ids: number[]) => {
+export const memoryResources = async (
+  collection_ids: number[],
+  fromTime?: number,
+  toTime?: number
+) => {
   let queryString = "";
   if (collection_ids.length > 0) {
     queryString = `
       SELECT collection_id, machine_id, instance_index, SUM(average_mem*(end_time - start_time)) AS resource_usage
       FROM instance_usage
+      ${
+        fromTime !== undefined && toTime !== undefined
+          ? `WHERE start_time > ${fromTime} AND end_time < ${toTime}`
+          : ""
+      }
       GROUP BY collection_id, machine_id, instance_index
       HAVING collection_id IN (
         ${Array(collection_ids.length).fill("?").join(",")}
@@ -98,6 +121,11 @@ export const memoryResources = async (collection_ids: number[]) => {
     queryString = `
       SELECT collection_id, machine_id, instance_index, SUM(average_mem*(end_time - start_time)) AS resource_usage
       FROM instance_usage
+      ${
+        fromTime !== undefined && toTime !== undefined
+          ? `WHERE start_time > ${fromTime} AND end_time < ${toTime}`
+          : ""
+      }
       GROUP BY collection_id, machine_id, instance_index
       `;
   }
