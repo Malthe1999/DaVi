@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from "react";
 import Plot from "react-plotly.js";
-import { collectionParents, cpuResources } from "../gateway/backend";
+import { collectionParents, cpuResources, memoryResources } from "../gateway/backend";
 import { unpack } from "../util/unpack";
 import { CircularProgress } from "@mui/material";
 import { ResourceTree } from "../structs/resource-tree";
@@ -9,8 +9,9 @@ import { ResourceUsage } from "../../../shared/types/resource-usage";
 const TreeMap = (props: {
   filteredNodes: string[];
   setCurrentlySelectedNode: React.Dispatch<React.SetStateAction<string>>;
+  viewedResource: string;
 }) => {
-  const { setCurrentlySelectedNode, filteredNodes } = props;
+  const { setCurrentlySelectedNode, filteredNodes, viewedResource } = props;
   const [isLoading, setIsLoading] = useState(true);
   const [dataPoints, setDataPoints] = useState<any[]>([]);
   const [allParents, setAllParents] = useState<{ [key: string]: string }>({});
@@ -29,10 +30,18 @@ const TreeMap = (props: {
   }, []);
 
   useEffect(() => {
-    cpuResources(filteredNodes)
-      .then((res) => setAllResourceUsage(res))
-      .finally(() => setIsLoading(false));
-  }, [filteredNodes]);
+    if (viewedResource === "cpu") {
+      cpuResources(filteredNodes)
+        .then((res) => setAllResourceUsage(res))
+        .finally(() => setIsLoading(false));
+    } else if (viewedResource === "mem"){
+      memoryResources(filteredNodes)
+        .then((res) => setAllResourceUsage(res))
+        .finally(() => setIsLoading(false));
+    } else {
+      console.log('Invalid resource type', viewedResource)
+    }
+  }, [filteredNodes, viewedResource]);
 
   useEffect(() => {
     const tree = new ResourceTree("Cluster");
@@ -73,10 +82,11 @@ const TreeMap = (props: {
             },
           }}
           onUpdate={(x) => {
-            setCurrentlySelectedNode((
-              (x.data[0] as any)["level"]?.split('-')[0] ?? "Cluster"
-            ).toString())
-            console.log(((x.data[0] as any)['level'] ?? 'Cluster').toString());
+            setCurrentlySelectedNode(
+              (
+                (x.data[0] as any)["level"]?.split("-")[0] ?? "Cluster"
+              ).toString()
+            );
           }}
         />
       )}

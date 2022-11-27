@@ -1,3 +1,4 @@
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useState } from "react";
 import TreeMap from "./better-treemap";
 import "./index.css";
@@ -61,6 +62,8 @@ export const Main = () => {
   const [currentlySelectedNode, setCurrentlySelectedNode] =
     useState<string>("Cluster");
 
+  const [viewedResource, setViewedResource] = useState<string>("cpu");
+
   return (
     <>
       <h1
@@ -71,9 +74,31 @@ export const Main = () => {
         Borg Cluster
       </h1>
       <div className="custom-container">
+        <FormControl>
+          <InputLabel
+            style={{
+              color: "white",
+            }}
+          >
+            Resource
+          </InputLabel>
+          <Select
+            style={{
+              color: "white",
+            }}
+            value={viewedResource}
+            label="Resource"
+            onChange={(event) => setViewedResource(event.target.value)}
+          >
+            <MenuItem value={"cpu"}>CPU</MenuItem>
+            <MenuItem value={"mem"}>RAM</MenuItem>
+          </Select>
+        </FormControl>
+
         <TreeMap
           filteredNodes={filteredNodes}
           setCurrentlySelectedNode={setCurrentlySelectedNode}
+          viewedResource={viewedResource}
         ></TreeMap>
         <SideView
           clickedNodes={clickedNodes}

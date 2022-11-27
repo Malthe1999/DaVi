@@ -113,7 +113,7 @@ export const cpuResources = async (collection_ids?: (number|string)[]) => {
     .catch((err) => Promise.reject(err as Error));
 };
 
-export const memoryResources = async (collection_ids?: number[]) => {
+export const memoryResources = async (collection_ids?: (number|string)[]) => {
   return getData<{ data: ResourceUsage[] }>(
     "memory-resources/" + (collection_ids ? collection_ids.join(",") : "")
   )
