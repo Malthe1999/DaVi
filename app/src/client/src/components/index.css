@@ -17,13 +17,14 @@ svg.custom .highlighted circle {
 	fill: #1fed0c;
 	stroke: #1fed0c;
 	stroke-width: 2px;
-	width: 150%;
-	height: 150%;
+	width: 100%;
+	height: 100%;
 }
 
 svg.custom .emphasized circle {
 	stroke: red;
-	stroke-width: 6px;
+	fill: red;
+	stroke-width: 5px;
 }
 
 svg.custom .node text {

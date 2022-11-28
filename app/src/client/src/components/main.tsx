@@ -1,5 +1,7 @@
 import {
+  Checkbox,
   FormControl,
+  FormControlLabel,
   InputLabel,
   MenuItem,
   Select,
@@ -71,6 +73,7 @@ export const Main = () => {
   const [viewedResource, setViewedResource] = useState<string>("cpu");
   const [fromTime, setFromTime] = useState<number>(300000000);
   const [toTime, setToTime] = useState<number>(2679000000000);
+  const [useDifferentColorScales, setUseDifferentColorScales] = useState(false);
 
   return (
     <>
@@ -106,14 +109,28 @@ export const Main = () => {
             label="From Time"
             variant="standard"
             value={fromTime}
-            onChange={(event) => {setFromTime(+event.target.value)}}
+            onChange={(event) => {
+              setFromTime(+event.target.value);
+            }}
           />
           <TextField
             id="outlined-basic"
             label="To Time"
             variant="standard"
             value={toTime}
-            onChange={(event) => {setToTime(+event.target.value)}}
+            onChange={(event) => {
+              setToTime(+event.target.value);
+            }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={useDifferentColorScales}
+                onChange={(event) => setUseDifferentColorScales(event.target.checked)}
+                inputProps={{ "aria-label": "controlled" }}
+              />
+            }
+            label="Use different color scales for Collections, Machines, and Instances"
           />
         </FormControl>
 
@@ -123,6 +140,7 @@ export const Main = () => {
           viewedResource={viewedResource}
           fromTime={fromTime}
           toTime={toTime}
+          useDifferentColorScales={useDifferentColorScales}
         ></TreeMap>
         <SideView
           clickedNodes={clickedNodes}

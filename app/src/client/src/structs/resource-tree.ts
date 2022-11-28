@@ -1,5 +1,17 @@
 import chroma from "chroma-js";
 
+const collectionColorScheme = (max: number) =>
+  chroma.scale("Blues").domain([0, Math.log(max)]);
+const machineColorScheme = (max: number) =>
+  chroma.scale("Greens").domain([0, Math.log(max)]);
+const instanceColorScheme = (max: number) =>
+  chroma.scale("Purples").domain([0, Math.log(max)]);
+const otherColorScheme = (max: number) =>
+  chroma.scale("Greys").domain([0, Math.log(max)]);
+
+const generalColorScale = (max: number) =>
+  chroma.scale("YlGnBu").domain([0, Math.log(max)]);
+
 export class ResourceTree {
   root: Node;
   pointers: { [key: string]: Node };
@@ -14,13 +26,19 @@ export class ResourceTree {
     this.pointers[rootName] = this.root;
   }
 
-  addEdge(parent: string, child: string, resourceUsage?: number) {
+  addEdge(
+    parent: string,
+    child: string,
+    resourceUsage?: number,
+    type?: string
+  ) {
     if (this.pointers[child] === undefined) {
       this.pointers[child] = {
         name: child,
         parent: undefined,
         children: [],
         resourceUsage: resourceUsage,
+        type: type,
       };
     }
 
@@ -73,20 +91,38 @@ export class ResourceTree {
     return result;
   }
 
-  toDataPoints() {
+  toDataPoints(useDifferentColorScales: boolean) {
     this.calculateNodeSizes();
     this.calculateResources(this.root);
-    const colourscale = chroma
-      .scale("YlGnBu")
-      .domain([0, Math.log(this.getMaxResources())]);
+    const colorScale = generalColorScale(this.getMaxResources());
+    const collection = collectionColorScheme(this.getMaxResources());
+    const machine = machineColorScheme(this.getMaxResources());
+    const instance = instanceColorScheme(this.getMaxResources());
+    const other = otherColorScheme(this.getMaxResources());
 
     const result = [];
     for (const node of Object.values(this.pointers)) {
+      let color = colorScale(Math.log(node.resourceUsage!));
+      if (useDifferentColorScales) {
+        if (node.type === "collection") {
+          color = collection(Math.log(node.resourceUsage!));
+        }
+        else if (node.type === "machine") {
+          color = machine(Math.log(node.resourceUsage!));
+        }
+        else if (node.type === "instance") {
+          color = instance(Math.log(node.resourceUsage!));
+        }
+        else {
+          color = other(Math.log(node.resourceUsage!));
+        }
+      }
+
       result.push({
         label: node.name,
         parent: node.parent?.name ?? "", // Cluster has no parent
         nodeSize: node.nodeSize,
-        color: colourscale(Math.log(node.resourceUsage!)).hex(),
+        color: color.hex(),
       });
     }
     return result;
@@ -101,4 +137,5 @@ interface Node {
   highlighted?: boolean;
   nodeSize?: number;
   resourceUsage?: number;
+  type?: string;
 }

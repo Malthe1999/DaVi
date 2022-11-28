@@ -1,6 +1,10 @@
 import { memo, useEffect, useState } from "react";
 import Plot from "react-plotly.js";
-import { collectionParents, cpuResources, memoryResources } from "../gateway/backend";
+import {
+  collectionParents,
+  cpuResources,
+  memoryResources,
+} from "../gateway/backend";
 import { unpack } from "../util/unpack";
 import { CircularProgress } from "@mui/material";
 import { ResourceTree } from "../structs/resource-tree";
@@ -12,8 +16,16 @@ const TreeMap = (props: {
   viewedResource: string;
   fromTime: number;
   toTime: number;
+  useDifferentColorScales: boolean;
 }) => {
-  const { setCurrentlySelectedNode, filteredNodes, viewedResource, fromTime, toTime } = props;
+  const {
+    setCurrentlySelectedNode,
+    filteredNodes,
+    viewedResource,
+    fromTime,
+    toTime,
+    useDifferentColorScales,
+  } = props;
   const [isLoading, setIsLoading] = useState(true);
   const [dataPoints, setDataPoints] = useState<any[]>([]);
   const [allParents, setAllParents] = useState<{ [key: string]: string }>({});
@@ -36,24 +48,29 @@ const TreeMap = (props: {
       cpuResources(filteredNodes, fromTime, toTime)
         .then((res) => setAllResourceUsage(res))
         .finally(() => setIsLoading(false));
-    } else if (viewedResource === "mem"){
+    } else if (viewedResource === "mem") {
       memoryResources(filteredNodes, fromTime, toTime)
         .then((res) => setAllResourceUsage(res))
         .finally(() => setIsLoading(false));
     } else {
-      console.log('Invalid resource type', viewedResource)
+      console.log("Invalid resource type", viewedResource);
     }
   }, [filteredNodes, viewedResource, fromTime, toTime]);
 
   useEffect(() => {
     const tree = new ResourceTree("Cluster");
     for (const x of allResourceUsage) {
-      tree.addEdge(allParents[x.collection_id], collection(x));
-      tree.addEdge(collection(x), machine(x));
-      tree.addEdge(machine(x), instance(x), x.resource_usage);
+      tree.addEdge(
+        allParents[x.collection_id],
+        collection(x),
+        undefined,
+        "collection"
+      );
+      tree.addEdge(collection(x), machine(x), undefined, "machine");
+      tree.addEdge(machine(x), instance(x), x.resource_usage, "instance");
     }
-    setDataPoints(tree.toDataPoints());
-  }, [allResourceUsage, allParents]);
+    setDataPoints(tree.toDataPoints(useDifferentColorScales));
+  }, [allResourceUsage, allParents, useDifferentColorScales]);
 
   return (
     <>
