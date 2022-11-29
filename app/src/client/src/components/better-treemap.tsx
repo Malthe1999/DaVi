@@ -9,6 +9,7 @@ import { unpack } from "../util/unpack";
 import { CircularProgress } from "@mui/material";
 import { ResourceTree } from "../structs/resource-tree";
 import { ResourceUsage } from "../../../shared/types/resource-usage";
+import {randomNameAdj, randomNameAni, randomNameCol} from '../util/name-generator';
 
 const TreeMap = (props: {
   filteredNodes: string[];
