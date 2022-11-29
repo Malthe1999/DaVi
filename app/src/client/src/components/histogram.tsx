@@ -1,10 +1,10 @@
 import { memo, useEffect, useState } from "react";
 import Plot from "react-plotly.js";
-import { collectionParents, cpuResources, memoryResources } from "../gateway/backend";
+import { collectionParents, cpuHistogram, cpuResources, memoryResources } from "../gateway/backend";
 import { unpack } from "../util/unpack";
 import { CircularProgress } from "@mui/material";
 import { ResourceTree } from "../structs/resource-tree";
-import { ResourceUsage } from "../../../shared/types/resource-usage";
+import { HistogramUsage } from "../../../shared/types/histogram-data";
 
 const Histogram = (props: {
   filteredNodes: string[];
@@ -23,29 +23,11 @@ const Histogram = (props: {
     useDifferentColorScales,
   } = props;
   const [isLoading, setIsLoading] = useState(true);
-  const [dataPoints, setDataPoints] = useState<any[]>([]);
-  const [allParents, setAllParents] = useState<{ [key: string]: string }>({});
-  const [allResourceUsage, setAllResourceUsage] = useState<ResourceUsage[]>([]);
+  const [allResourceUsage, setAllResourceUsage] = useState<HistogramUsage[]>([]);
 
   useEffect(() => {
-    collectionParents().then((x) => {
-      const parents: { [key: string]: string } = {};
-      for (const relationship of x) {
-        parents[relationship.collection_id.toString()] = (
-          relationship.parent_collection_id ?? "Cluster"
-        ).toString();
-      }
-      setAllParents(parents);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (viewedResource === "cpu") {
-      cpuResources(filteredNodes, fromTime, toTime)
-        .then((res) => setAllResourceUsage(res))
-        .finally(() => setIsLoading(false));
-    } else if (viewedResource === "mem") {
-      memoryResources(filteredNodes, fromTime, toTime)
+    if (viewedResource === "instance") {
+      cpuHistogram(0,0, fromTime, toTime)
         .then((res) => setAllResourceUsage(res))
         .finally(() => setIsLoading(false));
     } else {
@@ -53,30 +35,15 @@ const Histogram = (props: {
     }
   }, [filteredNodes, viewedResource, fromTime, toTime]);
 
-  useEffect(() => {
-    const tree = new ResourceTree("Cluster");
-    for (const x of allResourceUsage) {
-      tree.addEdge(
-        allParents[x.collection_id],
-        collection(x),
-        undefined,
-        "collection"
-      );
-      tree.addEdge(collection(x), machine(x), undefined, "machine");
-      tree.addEdge(machine(x), instance(x), x.resource_usage, "instance");
-    }
-    setDataPoints(tree.toDataPoints(useDifferentColorScales));
-  }, [allResourceUsage, allParents, useDifferentColorScales]);
-
   return (
     <>
       {isLoading ? (
         <CircularProgress />
       ) : (
-        <Plot
+        <Plot style={{position:"absolute"}}
           data={[
             {
-              values: [],
+              values: unpack(allResourceUsage, "average_cpu"),
               type: "histogram",
             },
           ]}
@@ -104,14 +71,5 @@ const Histogram = (props: {
   );
 };
 
-const collection = (x: ResourceUsage) => {
-  return x.collection_id;
-};
-const machine = (x: ResourceUsage) => {
-  return `${x.collection_id}-${x.machine_id}`;
-};
-const instance = (x: ResourceUsage) => {
-  return `${x.collection_id}-${x.machine_id}-${x.instance_index}`;
-};
 
 export default memo(Histogram);

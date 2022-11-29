@@ -19,6 +19,7 @@ import { CollectionSizeResponse } from "../../../shared/types/collection-size";
 import { CpuUsage, CpuUsageResponse } from "../../../shared/types/cpu-usage";
 import { CollectionSpreadResponse } from "../../../shared/types/collection-spread";
 import { ResourceUsage } from "../../../shared/types/resource-usage";
+import { HistogramUsage } from "../../../shared/types/histogram-data";
 
 export const getData = async <T>(resource: string): Promise<T> => {
   const res = await fetch(`http://localhost:17500/api/${resource}`, {
@@ -138,6 +139,26 @@ export const memoryResources = async (
   return getData<{ data: ResourceUsage[] }>(
     "memory-resources/" +
       (collection_ids ? collection_ids.join(",") : "") +
+      "/" +
+      fromTime +
+      "/" +
+      toTime
+  )
+    .then((res) => Promise.resolve(res.data))
+    .catch((err) => Promise.reject(err as Error));
+};
+
+export const cpuHistogram = async (
+  collection_id?: (number | string),
+  instance_index?: number,
+  fromTime?: number,
+  toTime?: number
+) => {
+  return getData<{ data: HistogramUsage[] }>(
+    "histogram-cpu/" +
+      collection_id +
+      "/" +
+      instance_index +
       "/" +
       fromTime +
       "/" +

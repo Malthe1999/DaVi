@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import Plot from 'react-plotly.js';
 import {CollectionSizeResponse} from '../../../shared/types/collection-size';
 import {allCollectionSizes} from '../gateway/backend';
-import {randomName} from '../util/name-generator';
+import {randomNameAdj} from '../util/name-generator';
 
 export const TreeMapwSlider = () => {
   const [data, setData] = useState<CollectionSizeResponse>({
@@ -30,7 +30,7 @@ export const TreeMapwSlider = () => {
             data={
                 [
                     {
-                      labels: data.data.map(x => randomName(x.name)),
+                      labels: data.data.map(x => randomNameAdj(x.name)),
                       parents: data.data.map(x => ''), // no parents
                       values: data.data.map(x => x.size),
                       type: 'treemap',

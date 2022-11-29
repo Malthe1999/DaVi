@@ -1,4 +1,5 @@
 import chroma from "chroma-js";
+import {randomNameAdj, randomNameAni, randomNameCol} from '../util/name-generator';
 
 const collectionColorScheme = (max: number) =>
   chroma.scale("Blues").domain([0, Math.log(max)]);
@@ -103,6 +104,7 @@ export class ResourceTree {
     const result = [];
     for (const node of Object.values(this.pointers)) {
       let color = colorScale(Math.log(node.resourceUsage!));
+      let label = "";
       if (useDifferentColorScales) {
         if (node.type === "collection") {
           color = collection(Math.log(node.resourceUsage!));
@@ -117,9 +119,21 @@ export class ResourceTree {
           color = other(Math.log(node.resourceUsage!));
         }
       }
-
+      if (node.type === "collection") {
+        label = randomNameAdj(node.name!)
+      }
+      else if (node.type === "machine") {
+        label = randomNameCol(node.name!)
+      }
+      else if (node.type === "instance") {
+        label = randomNameAni(node.name!)
+      }
+      else {
+        label = "Cluster"
+      }
       result.push({
-        label: node.name,
+        label: label,
+        id: node.name,
         parent: node.parent?.name ?? "", // Cluster has no parent
         nodeSize: node.nodeSize,
         color: color.hex(),

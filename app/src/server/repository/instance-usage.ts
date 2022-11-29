@@ -6,6 +6,8 @@ import {
   InstanceUsage,
 } from "../../shared/types/instance-usage";
 import { ResourceUsage } from "../../shared/types/resource-usage";
+import collection from "../../client/src/charts/collection";
+import { HistogramUsage } from "../../shared/types/histogram-data";
 
 export const findByMachineId = (id: number, callback: any) => {
   const queryString = `
@@ -136,6 +138,39 @@ export const memoryResources = async (
         .query(queryString, collection_ids)
         .then((res) =>
           (res[0] as RowDataPacket[]).map((x) => x as ResourceUsage)
+        )
+        .catch((err) => err)
+    )
+    .catch((err) => err);
+};
+
+export const cpuResourcesSingleInstance = async (
+  collection_id?: number, 
+  instance_index?: number,
+  fromTime?: number,
+  toTime?: number
+) => {
+  let queryString = "";
+  queryString = `
+    SELECT average_cpu AS average_cpu
+    FROM instance_usage
+    ${
+      fromTime !== undefined && toTime !== undefined && collection_id !== undefined && instance_index !== undefined
+        ? `WHERE start_time > ${fromTime} AND end_time < ${toTime} AND collection_id = ${collection_id} AND instance_index = ${instance_index}`
+        : ""
+    }`;
+
+  return dbAsync()
+    .then((db) =>
+      db
+        .query(queryString, instance_index)
+        .then((res) =>
+          (res[0] as RowDataPacket[]).map(
+            (x) =>
+              new HistogramUsage(
+                x["average_cpu"].toString()
+              )
+          )
         )
         .catch((err) => err)
     )

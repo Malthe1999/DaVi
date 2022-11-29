@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import TreeMap from "./better-treemap";
+import Histogram from "./histogram";
 import "./index.css";
 // @ts-ignore
 import { SideView } from "./side-view";
@@ -133,7 +134,15 @@ export const Main = () => {
             label="Use different color scales for Collections, Machines, and Instances"
           />
         </FormControl>
-
+        <div>
+        <Histogram
+          filteredNodes={filteredNodes}
+          setCurrentlySelectedNode={setCurrentlySelectedNode}
+          viewedResource={viewedResource}
+          fromTime={fromTime}
+          toTime={toTime}
+          useDifferentColorScales={useDifferentColorScales}
+        ></Histogram>
         <TreeMap
           filteredNodes={filteredNodes}
           setCurrentlySelectedNode={setCurrentlySelectedNode}
@@ -142,6 +151,7 @@ export const Main = () => {
           toTime={toTime}
           useDifferentColorScales={useDifferentColorScales}
         ></TreeMap>
+        </div>
         <SideView
           clickedNodes={clickedNodes}
           setClickedNodes={setClickedNodes}

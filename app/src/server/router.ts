@@ -25,6 +25,7 @@ import {
 import {
   averageCpuUsagePerCollection,
   cpuResources,
+  cpuResourcesSingleInstance,
   findByMachineId,
   memoryResources,
 } from "./repository/instance-usage";
@@ -230,6 +231,24 @@ router.get(
       req.params["collection_ids"] !== undefined
         ? req.params["collection_ids"].split(",").map((x) => +x)
         : [],
+      req.params["from_time"] !== "undefined"
+        ? +req.params["from_time"]
+        : undefined,
+      req.params["to_time"] !== "undefined" ? +req.params["to_time"] : undefined
+    )
+      .then((result) => res.status(200).json({ data: result }))
+      .catch((err) => res.status(500).json({ errorMessage: err.message }))
+);
+router.get(
+  "/histogram-cpu/:collection_ids?/:instance_index?/:from_time?/:to_time?",
+  async (req: Request, res: Response) =>
+    cpuResourcesSingleInstance(
+      req.params["collection_ids"] !== "undefined"
+        ? +req.params["collection_ids"]
+        : undefined,
+      req.params["instance_index"] !== "undefined"
+      ? +req.params["instance_index"]
+      : undefined,
       req.params["from_time"] !== "undefined"
         ? +req.params["from_time"]
         : undefined,
