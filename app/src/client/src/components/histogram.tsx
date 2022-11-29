@@ -7,43 +7,37 @@ import { ResourceTree } from "../structs/resource-tree";
 import { HistogramUsage } from "../../../shared/types/histogram-data";
 
 const Histogram = (props: {
-  filteredNodes: string[];
-  setCurrentlySelectedNode: React.Dispatch<React.SetStateAction<string>>;
-  viewedResource: string;
   fromTime: number;
   toTime: number;
-  useDifferentColorScales: boolean;
+  showHistogram: number[];
 }) => {
   const {
-    setCurrentlySelectedNode,
-    filteredNodes,
-    viewedResource,
     fromTime,
     toTime,
-    useDifferentColorScales,
+    showHistogram
   } = props;
   const [isLoading, setIsLoading] = useState(true);
-  const [allResourceUsage, setAllResourceUsage] = useState<HistogramUsage[]>([]);
+  const [allHistogram, setAallHistogram] = useState<HistogramUsage[]>([]);
 
   useEffect(() => {
-    if (viewedResource === "instance") {
-      cpuHistogram(0,0, fromTime, toTime)
-        .then((res) => setAllResourceUsage(res))
+    if (showHistogram.length === 3) {
+      cpuHistogram(showHistogram[0],showHistogram[2], fromTime, toTime)
+        .then((res) => setAallHistogram(res))
         .finally(() => setIsLoading(false));
     } else {
-      console.log("Invalid resource type", viewedResource);
+      setAallHistogram([])
+      console.log("Invalid resource type");
     }
-  }, [filteredNodes, viewedResource, fromTime, toTime]);
-
+  }, [showHistogram[0], showHistogram[2], fromTime, toTime]);
   return (
     <>
       {isLoading ? (
         <CircularProgress />
       ) : (
-        <Plot style={{position:"absolute"}}
+        <Plot
           data={[
             {
-              values: unpack(allResourceUsage, "average_cpu"),
+              x: unpack(allHistogram, "average_cpu"),
               type: "histogram",
             },
           ]}
@@ -57,13 +51,6 @@ const Histogram = (props: {
               t: 0,
               pad: 0,
             },
-          }}
-          onUpdate={(x) => {
-            setCurrentlySelectedNode(
-              (
-                (x.data[0] as any)["level"]?.split("-")[0] ?? "Cluster"
-              ).toString()
-            );
           }}
         />
       )}

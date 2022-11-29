@@ -140,12 +140,9 @@ export const Main = () => {
         </FormControl>
         <div>
           <Histogram
-            filteredNodes={filteredNodes}
-            setCurrentlySelectedNode={setCurrentlySelectedNode}
-            viewedResource={viewedResource}
             fromTime={fromTime}
             toTime={toTime}
-            useDifferentColorScales={useDifferentColorScales}
+            showHistogram={showHistogram}
           ></Histogram>
           <TreeMap
             filteredNodes={filteredNodes}

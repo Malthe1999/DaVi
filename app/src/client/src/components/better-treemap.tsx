@@ -114,6 +114,8 @@ const TreeMap = (props: {
               ((x.data[0] as any)["level"]?.toString().match(/\-/g) || []).length == 2
             ) {
               setShowHistogram((x.data[0] as any)["level"]?.split("-").map((x: string) => +x))
+            } else {
+              setShowHistogram([])
             }
           }}
         />
