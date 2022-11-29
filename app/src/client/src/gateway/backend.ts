@@ -1,9 +1,11 @@
 import {
+  CollectionEvent,
   CollectionEventResponse,
   CollectionId,
   Parent,
 } from "../../../shared/types/collection-event";
 import {
+  InstanceEvent,
   InstanceEventResponse,
   RequestedInstanceResources,
 } from "../../../shared/types/instance-event";
@@ -12,7 +14,7 @@ import {
   InstanceUsageResponse,
 } from "../../../shared/types/instance-usage";
 import { MachineAttributesResponse } from "../../../shared/types/machine-attributes";
-import { MachineEventResponse } from "../../../shared/types/machine-event";
+import { MachineEvent, MachineEventResponse } from "../../../shared/types/machine-event";
 import { MachineResult } from "../../../shared/types/machine";
 import { CollectionResult } from "../../../shared/types/collection";
 import { CollectionSizeResponse } from "../../../shared/types/collection-size";
@@ -142,6 +144,30 @@ export const memoryResources = async (
       fromTime +
       "/" +
       toTime
+  )
+    .then((res) => Promise.resolve(res.data))
+    .catch((err) => Promise.reject(err as Error));
+};
+
+export const getCollectionEvents = async (ids: (number | string)[]) => {
+  return getData<{ data: CollectionEvent[] }>(
+    "collection-events/" + (ids ? ids.join(",") : "")
+  )
+    .then((res) => Promise.resolve(res.data))
+    .catch((err) => Promise.reject(err as Error));
+};
+
+export const getMachineEvents = async (ids: (number | string)[]) => {
+  return getData<{ data: MachineEvent[] }>(
+    "machine-events/" + (ids ? ids.join(",") : "")
+  )
+    .then((res) => Promise.resolve(res.data))
+    .catch((err) => Promise.reject(err as Error));
+};
+
+export const getInstanceEvents = async (ids: (number | string)[]) => {
+  return getData<{ data: InstanceEvent[] }>(
+    "instance-events/" + (ids ? ids.join(",") : "")
   )
     .then((res) => Promise.resolve(res.data))
     .catch((err) => Promise.reject(err as Error));

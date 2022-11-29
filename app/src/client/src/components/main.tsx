@@ -12,6 +12,7 @@ import TreeMap from "./better-treemap";
 import "./index.css";
 // @ts-ignore
 import { SideView } from "./side-view";
+import {TimeRangeSlider} from "./timerange-slider";
 
 export const Main = () => {
   const [clickedNodes, setClickedNodes] = useState<string[]>([
@@ -84,6 +85,7 @@ export const Main = () => {
       >
         Borg Cluster
       </h1>
+      <TimeRangeSlider></TimeRangeSlider>
       <div className="custom-container">
         <FormControl>
           <InputLabel

@@ -2,7 +2,7 @@ import { db, dbAsync } from "../db";
 import { RowDataPacket } from "mysql2";
 import { CollectionEvent, Parent } from "../../shared/types/collection-event";
 
-const findByCollectionId = (id: number, callback: any) => {
+export const findByCollectionId = (id: number, callback: any) => {
   const queryString = `
     SELECT *
     FROM collection_events as t
@@ -21,7 +21,7 @@ const findByCollectionId = (id: number, callback: any) => {
   });
 };
 
-const parents = async (collection_ids: number[]) => {
+export const parents = async (collection_ids: number[]) => {
   let queryString = "";
   if (collection_ids.length) {
     queryString = `
@@ -48,7 +48,7 @@ const parents = async (collection_ids: number[]) => {
     .catch((err) => err);
 };
 
-const uniqueCollectionIds = async () => {
+export const uniqueCollectionIds = async () => {
   const queryString = `
     SELECT UNIQUE(collection_id)
     FROM collection_events`;
@@ -63,4 +63,22 @@ const uniqueCollectionIds = async () => {
     .catch((err) => err);
 };
 
-export { parents, findByCollectionId, uniqueCollectionIds };
+export const collectionEvents = async (ids: number[]) => {
+  const queryString = `
+    SELECT *
+    FROM collection_events
+    WHERE collection_id IN (${Array(ids.length)
+      .fill("?")
+      .join(",")})`;
+
+  return dbAsync()
+    .then((db) =>
+      db
+        .query(queryString, ids)
+        .then((res) =>
+          (res[0] as RowDataPacket[]).map((x: any) => x as CollectionEvent)
+        )
+        .catch((err) => err)
+    )
+    .catch((err) => err);
+};
