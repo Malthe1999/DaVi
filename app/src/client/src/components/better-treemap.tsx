@@ -17,6 +17,7 @@ const TreeMap = (props: {
   fromTime: number;
   toTime: number;
   useDifferentColorScales: boolean;
+  setShowHistogram: React.Dispatch<React.SetStateAction<number[]>>;
 }) => {
   const {
     setCurrentlySelectedNode,
@@ -25,6 +26,7 @@ const TreeMap = (props: {
     fromTime,
     toTime,
     useDifferentColorScales,
+    setShowHistogram
   } = props;
   const [isLoading, setIsLoading] = useState(true);
   const [dataPoints, setDataPoints] = useState<any[]>([]);
@@ -74,10 +76,11 @@ const TreeMap = (props: {
 
   return (
     <>
-      {isLoading ? (  
+      {isLoading ? (
         <CircularProgress />
       ) : (
-        <Plot style={{position:"absolute"}}
+        <Plot
+          style={{ position: "absolute" }}
           data={[
             {
               labels: unpack(dataPoints, "label"),
@@ -107,6 +110,11 @@ const TreeMap = (props: {
                 (x.data[0] as any)["level"]?.split("-")[0] ?? "Cluster"
               ).toString()
             );
+            if (
+              ((x.data[0] as any)["level"]?.toString().match(/\-/g) || []).length == 2
+            ) {
+              setShowHistogram((x.data[0] as any)["level"]?.split("-").map((x: string) => +x))
+            }
           }}
         />
       )}

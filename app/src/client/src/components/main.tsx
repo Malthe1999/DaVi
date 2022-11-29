@@ -75,6 +75,8 @@ export const Main = () => {
   const [fromTime, setFromTime] = useState<number>(300000000);
   const [toTime, setToTime] = useState<number>(2679000000000);
   const [useDifferentColorScales, setUseDifferentColorScales] = useState(false);
+  const [showHistogram, setShowHistogram] = useState<number[]>([]);
+  console.log(showHistogram);
 
   return (
     <>
@@ -127,7 +129,9 @@ export const Main = () => {
             control={
               <Checkbox
                 checked={useDifferentColorScales}
-                onChange={(event) => setUseDifferentColorScales(event.target.checked)}
+                onChange={(event) =>
+                  setUseDifferentColorScales(event.target.checked)
+                }
                 inputProps={{ "aria-label": "controlled" }}
               />
             }
@@ -135,22 +139,23 @@ export const Main = () => {
           />
         </FormControl>
         <div>
-        <Histogram
-          filteredNodes={filteredNodes}
-          setCurrentlySelectedNode={setCurrentlySelectedNode}
-          viewedResource={viewedResource}
-          fromTime={fromTime}
-          toTime={toTime}
-          useDifferentColorScales={useDifferentColorScales}
-        ></Histogram>
-        <TreeMap
-          filteredNodes={filteredNodes}
-          setCurrentlySelectedNode={setCurrentlySelectedNode}
-          viewedResource={viewedResource}
-          fromTime={fromTime}
-          toTime={toTime}
-          useDifferentColorScales={useDifferentColorScales}
-        ></TreeMap>
+          <Histogram
+            filteredNodes={filteredNodes}
+            setCurrentlySelectedNode={setCurrentlySelectedNode}
+            viewedResource={viewedResource}
+            fromTime={fromTime}
+            toTime={toTime}
+            useDifferentColorScales={useDifferentColorScales}
+          ></Histogram>
+          <TreeMap
+            filteredNodes={filteredNodes}
+            setCurrentlySelectedNode={setCurrentlySelectedNode}
+            viewedResource={viewedResource}
+            fromTime={fromTime}
+            toTime={toTime}
+            useDifferentColorScales={useDifferentColorScales}
+            setShowHistogram={setShowHistogram}
+          ></TreeMap>
         </div>
         <SideView
           clickedNodes={clickedNodes}
