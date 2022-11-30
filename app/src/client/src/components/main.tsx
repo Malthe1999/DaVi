@@ -80,7 +80,6 @@ export const Main = () => {
   const [toTime, setToTime] = useState<number>(2679000000000);
   const [useDifferentColorScales, setUseDifferentColorScales] = useState(false);
   const [showHistogram, setShowHistogram] = useState<number[]>([]);
-  console.log(showHistogram);
   const [eventFilters, setEventFilters] = useState<string[]>([]);
   const [tree, setTree] = useState(new Tree("Cluster"));
   const [parents, setParents] = useState(new Array<Parent>());
@@ -190,11 +189,22 @@ export const Main = () => {
             setEventFilters={setEventFilters}
           ></TreeMap>
         </div>
+        <SideView
+          clickedNodes={clickedNodes}
+          filteredNodes={filteredNodes}
+          setClickedNodes={setClickedNodes}
+          setFilteredNodes={setFilteredNodes}
+          currentlySelectedNode={currentlySelectedNode}
+          fromTime={fromTime}
+          toTime={toTime}
+        />
 
         <TimeRangeSlider
           collectionIds={collectionIds}
           machineIds={[eventFilters?.[1] ?? ""].filter((x) => x.length !== 0)}
           instanceIds={[eventFilters?.[2] ?? ""].filter((x) => x.length !== 0)}
+          setToTime={setToTime}
+          setFromTime={setFromTime}
         ></TimeRangeSlider>
       </div>
     </>

@@ -9,13 +9,22 @@ import { CollectionEvent } from "../../../shared/types/collection-event";
 import { unpack } from "../util/unpack";
 import { MachineEvent } from "../../../shared/types/machine-event";
 import { InstanceEvent } from "../../../shared/types/instance-event";
+import {
+  randomNameAdj,
+  randomNameAni,
+  randomNameCol,
+  randomNameStarWars,
+} from "../util/name-generator";
 
 export const TimeRangeSlider = (props: {
   collectionIds: (number | string)[];
   machineIds: (number | string)[];
   instanceIds: (number | string)[];
+  setToTime: React.Dispatch<React.SetStateAction<number>>;
+  setFromTime: React.Dispatch<React.SetStateAction<number>>;
 }) => {
-  const { collectionIds, machineIds, instanceIds } = props;
+  const { collectionIds, machineIds, instanceIds, setToTime, setFromTime } =
+    props;
   const [isLoading, setIsLoading] = useState(true);
   const [collectionEvents, setCollectionEvents] = useState<CollectionEvent[]>(
     []
@@ -38,7 +47,7 @@ export const TimeRangeSlider = (props: {
     ]).finally(() => setIsLoading(false));
   }, [collectionIds, machineIds, instanceIds]);
 
-  const startDate = new Date(2019, 1, 2).getTime();
+  const startDate = new Date(2019, 0, 2).getTime();
 
   const collectionsStart = [];
   const collectionsMid = [];
@@ -99,37 +108,197 @@ export const TimeRangeSlider = (props: {
             x: unpack(collectionsStart, "time").map(
               (x: number) => new Date(startDate + x / 1000)
             ),
-            y: new Array(collectionsStart.length).fill(0.6),
-            text: collectionsStart.map(x => `Event: ${x.type}<br>Collection: ${x.collection_id}`),
-            type: "box",
-            mode: "box",
+            y: new Array(collectionsStart.length).fill(1),
+            text: collectionsStart.map(
+              (x) =>
+                `Event: ${x.type}<br>Collection: ${randomNameAdj(
+                  x.collection_id.toString()
+                )}<br>Scheduling class: ${x.scheduling_class}<br>Priority: ${
+                  x.priority
+                }<br>User: ${randomNameStarWars(x.user)}`
+            ),
+            type: "scatter",
+            mode: "markers",
             hoverinfo: "text",
             boxpoints: "all",
             marker: { symbol: "arrow-right", size: 15, color: "blue" },
           },
           {
-            x: unpack(machineEvents, "time").map(
+            x: unpack(collectionsMid, "time").map(
               (x: number) => new Date(startDate + x / 1000)
             ),
-            y: new Array(machineEvents.length).fill(1),
-            text: [],
-            type: "box",
-            mode: "box",
+            y: new Array(collectionsMid.length).fill(1),
+            text: collectionsMid.map(
+              (x) =>
+                `Event: ${x.type}<br>Collection: ${randomNameAdj(
+                  x.collection_id.toString()
+                )}<br>Scheduling class: ${x.scheduling_class}<br>Priority: ${
+                  x.priority
+                }<br>User: ${randomNameStarWars(x.user)}`
+            ),
+            type: "scatter",
+            mode: "markers",
             hoverinfo: "text",
             boxpoints: "all",
-            marker: { symbol: "arrow-down", size: 15, color: "red" },
+            marker: { symbol: "circle", size: 15, color: "blue" },
           },
           {
-            x: unpack(instanceEvents, "time").map(
+            x: unpack(collectionsEnd, "time").map(
               (x: number) => new Date(startDate + x / 1000)
             ),
-            y: new Array(instanceEvents.length).fill(2),
-            text: [],
-            type: "box",
-            mode: "box",
+            y: new Array(collectionsEnd.length).fill(1),
+            text: collectionsEnd.map(
+              (x) =>
+                `Event: ${x.type}<br>Collection: ${randomNameAdj(
+                  x.collection_id.toString()
+                )}<br>Scheduling class: ${x.scheduling_class}<br>Priority: ${
+                  x.priority
+                }<br>User: ${randomNameStarWars(x.user)}`
+            ),
+            type: "scatter",
+            mode: "markers",
             hoverinfo: "text",
             boxpoints: "all",
-            marker: { symbol: "arrow-down", size: 15, color: "green" },
+            marker: { symbol: "arrow-left", size: 15, color: "blue" },
+          },
+          {
+            x: unpack(machinesStart, "time").map(
+              (x: number) => new Date(startDate + x / 1000)
+            ),
+            y: new Array(machinesStart.length).fill(1.6),
+            text: machinesStart.map(
+              (x) =>
+                `Event: ${x.type}<br>Machine: ${randomNameCol(
+                  collectionIds[0] + "-" + x.machine_id.toString()
+                )}<br>Capacity CPU: ${x.capacity_cpu}<br>Capacity RAM: ${
+                  x.capacity_mem
+                }`
+            ),
+            type: "scatter",
+            mode: "markers",
+            hoverinfo: "text",
+            boxpoints: "all",
+            marker: { symbol: "arrow-right", size: 15, color: "green" },
+          },
+          {
+            x: unpack(machinesMid, "time").map(
+              (x: number) => new Date(startDate + x / 1000)
+            ),
+            y: new Array(machinesMid.length).fill(1.6),
+            text: machinesMid.map(
+              (x) =>
+                `Event: ${x.type}<br>Machine: ${randomNameCol(
+                  collectionIds[0] + "-" + x.machine_id.toString()
+                )}<br>Capacity CPU: ${x.capacity_cpu}<br>Capacity RAM: ${
+                  x.capacity_mem
+                }`
+            ),
+            type: "scatter",
+            mode: "markers",
+            hoverinfo: "text",
+            boxpoints: "all",
+            marker: { symbol: "circle", size: 15, color: "green" },
+          },
+          {
+            x: unpack(machinesEnd, "time").map(
+              (x: number) => new Date(startDate + x / 1000)
+            ),
+            y: new Array(machinesEnd.length).fill(1.6),
+            text: machinesEnd.map(
+              (x) =>
+                `Event: ${x.type}<br>Machine: ${randomNameCol(
+                  collectionIds[0] + "-" + x.machine_id.toString()
+                )}<br>Capacity CPU: ${x.capacity_cpu}<br>Capacity RAM: ${
+                  x.capacity_mem
+                }`
+            ),
+            type: "scatter",
+            mode: "markers",
+            hoverinfo: "text",
+            boxpoints: "all",
+            marker: { symbol: "arrow-left", size: 15, color: "green" },
+          },
+          {
+            x: unpack(instancesStart, "time").map(
+              (x: number) => new Date(startDate + x / 1000)
+            ),
+            y: new Array(instancesStart.length).fill(2.2),
+            text: instancesStart.map(
+              (x) =>
+                `Event: ${x.type}<br>Instance: ${randomNameAni(
+                  x.collection_id.toString() +
+                    "-" +
+                    x.machine_id.toString() +
+                    "-" +
+                    x.instance_index.toString()
+                )}<br>Scheduling class: ${x.scheduling_class}<br>Priority: ${
+                  x.priority
+                }<br>Requested CPU: ${x.requested_cpu}<br>Requested RAM: ${
+                  x.requested_mem
+                }`
+            ),
+            type: "scatter",
+            mode: "markers",
+            hoverinfo: "text",
+            boxpoints: "all",
+            marker: { symbol: "arrow-right", size: 15, color: "purple" },
+          },
+          {
+            x: unpack(instancesMid, "time").map(
+              (x: number) => new Date(startDate + x / 1000)
+            ),
+            y: new Array(instancesMid.length).fill(2.2),
+            text: instancesMid.map(
+              (x) =>
+                `Event: ${x.type}<br>Instance: ${randomNameAni(
+                  x.collection_id.toString() +
+                    "-" +
+                    x.machine_id.toString() +
+                    "-" +
+                    x.instance_index.toString()
+                )}<br>Scheduling class: ${x.scheduling_class}<br>Priority: ${
+                  x.priority
+                }<br>Requested CPU: ${x.requested_cpu}<br>Requested RAM: ${
+                  x.requested_mem
+                }`
+            ),
+            type: "scatter",
+            mode: "markers",
+            hoverinfo: "text",
+            boxpoints: "all",
+            marker: { symbol: "circle", size: 15, color: "purple" },
+          },
+          {
+            x: unpack(instancesEnd, "time").map(
+              (x: number) => new Date(startDate + x / 1000)
+            ),
+            y: new Array(instancesEnd.length).fill(2.2),
+            text: instancesEnd.map(
+              (x) =>
+                `Event: ${x.type}<br>Instance: ${randomNameAni(
+                  x.collection_id.toString() +
+                    "-" +
+                    x.machine_id.toString() +
+                    "-" +
+                    x.instance_index.toString()
+                )}<br>Scheduling class: ${x.scheduling_class}<br>Priority: ${
+                  x.priority
+                }<br>Requested CPU: ${x.requested_cpu}<br>Requested RAM: ${
+                  x.requested_mem
+                }`
+            ),
+            type: "scatter",
+            mode: "markers",
+            hoverinfo: "text",
+            boxpoints: "all",
+            marker: { symbol: "arrow-left", size: 15, color: "purple" },
+          },
+          {
+            x: [new Date(2019, 0, 1), new Date(2019, 1, 3)],
+            y: [0, 0],
+            type: "scatter",
+            mode: "lines",
+            marker: {},
           },
         ]}
         layout={{
@@ -137,16 +306,21 @@ export const TimeRangeSlider = (props: {
           height: 200,
           showlegend: false,
           yaxis: {
+            mirror: true,
+            showline: true,
             visible: false,
             fixedrange: true,
-            range: [0, 3],
+            range: [0.7, 2.5],
           },
           xaxis: {
+            mirror: true,
+            showline: true,
+            ticks: "outside",
             rangeslider: {
               borderwidth: 1,
               thickness: 0.3,
             },
-            range: [new Date(2019, 0, 1), new Date(2019, 2, 6)], // Dates are shifted to start on 2019-01-02
+            range: [new Date(2019, 0, 1), new Date(2019, 1, 3)], // Dates are shifted to start on 2019-01-02
           },
           margin: {
             b: 10,
@@ -159,7 +333,16 @@ export const TimeRangeSlider = (props: {
         onRelayout={(event) => {
           const start = event["xaxis.range[0]"] || event["xaxis.range"]?.[0];
           const end = event["xaxis.range[1]"] || event["xaxis.range"]?.[1];
-          console.log(start, end);
+          setFromTime(
+            (new Date(start?.toString() ?? new Date(2019, 0, 1)).getTime() -
+              new Date(startDate).getTime()) *
+              1000
+          );
+          setToTime(
+            (new Date(end?.toString() ?? new Date(2019, 1, 3)).getTime() -
+              new Date(startDate).getTime()) *
+              1000
+          );
         }}
       />
     </>

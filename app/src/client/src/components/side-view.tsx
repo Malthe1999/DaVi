@@ -73,7 +73,7 @@ export const SideView = (props: {
   }, [clickedNodes, parents, currentlySelectedNode]);
 
   return (
-    <div className="custom-container">
+    <div className="custom-container" style={{marginTop: 800}}>
       <TreeGraph
         data={tree.root}
         height={600}

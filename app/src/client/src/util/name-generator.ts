@@ -22,3 +22,10 @@ export const randomNameAni = (seed: string) => {
         seed: seed,
     });
 }
+export const randomNameStarWars = (seed: string) => {
+    return uniqueNamesGenerator({
+        dictionaries: [names.starWars],
+        separator: '-',
+        seed: seed,
+    });
+}
