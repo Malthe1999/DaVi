@@ -18,6 +18,7 @@ const TreeMap = (props: {
   toTime: number;
   useDifferentColorScales: boolean;
   setShowHistogram: React.Dispatch<React.SetStateAction<number[]>>;
+  setEventFilters: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
   const {
     setCurrentlySelectedNode,
@@ -26,7 +27,8 @@ const TreeMap = (props: {
     fromTime,
     toTime,
     useDifferentColorScales,
-    setShowHistogram
+    setShowHistogram,
+    setEventFilters,
   } = props;
   const [isLoading, setIsLoading] = useState(true);
   const [dataPoints, setDataPoints] = useState<any[]>([]);
@@ -105,6 +107,12 @@ const TreeMap = (props: {
             },
           }}
           onUpdate={(x) => {
+            if ((x.data[0] as any)["level"] === "Cluster") {
+              setEventFilters([]);
+            } else {
+              setEventFilters((x.data[0] as any)["level"]?.split("-"));
+            }
+
             setCurrentlySelectedNode(
               (
                 (x.data[0] as any)["level"]?.split("-")[0] ?? "Cluster"

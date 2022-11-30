@@ -1,5 +1,5 @@
 import { MachineEvent } from "../../shared/types/machine-event";
-import { db } from "../db";
+import { db, dbAsync } from "../db";
 import { RowDataPacket } from "mysql2";
 
 export const findByMachineId = (id: number, callback: any) => {
@@ -19,4 +19,24 @@ export const findByMachineId = (id: number, callback: any) => {
       rows.map((x: any) => x as MachineEvent)
     );
   });
+};
+
+export const machineEvents = async (ids: number[]) => {
+  const queryString = `
+    SELECT *
+    FROM machine_events
+    WHERE machine_id IN (${Array(ids.length)
+      .fill("?")
+      .join(",")})`;
+
+  return dbAsync()
+    .then((db) =>
+      db
+        .query(queryString, ids)
+        .then((res) =>
+          (res[0] as RowDataPacket[]).map((x: any) => x as MachineEvent)
+        )
+        .catch((err) => err)
+    )
+    .catch((err) => err);
 };
