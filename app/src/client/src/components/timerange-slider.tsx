@@ -1,150 +1,167 @@
 import { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
-import { CircularProgress } from "@mui/material";
-import { getCollectionEvents, getInstanceEvents, getMachineEvents } from "../gateway/backend";
+import {
+  getCollectionEvents,
+  getInstanceEvents,
+  getMachineEvents,
+} from "../gateway/backend";
 import { CollectionEvent } from "../../../shared/types/collection-event";
 import { unpack } from "../util/unpack";
-import {MachineEvent} from "../../../shared/types/machine-event";
-import {InstanceEvent} from "../../../shared/types/instance-event";
+import { MachineEvent } from "../../../shared/types/machine-event";
+import { InstanceEvent } from "../../../shared/types/instance-event";
 
-export const TimeRangeSlider = (props: { filteredNodes?: string[] }) => {
+export const TimeRangeSlider = (props: {
+  collectionIds: (number | string)[];
+  machineIds: (number | string)[];
+  instanceIds: (number | string)[];
+}) => {
+  const { collectionIds, machineIds, instanceIds } = props;
   const [isLoading, setIsLoading] = useState(true);
   const [collectionEvents, setCollectionEvents] = useState<CollectionEvent[]>(
     []
   );
-  const [machineEvents, setMachineEvents] = useState<MachineEvent[]>(
-    []
-  );
-
-  const [instanceEvents, setInstanceEvents] = useState<InstanceEvent[]>(
-    []
-  );
+  const [machineEvents, setMachineEvents] = useState<MachineEvent[]>([]);
+  const [instanceEvents, setInstanceEvents] = useState<InstanceEvent[]>([]);
 
   useEffect(() => {
+    setIsLoading(true);
     Promise.all([
-      getCollectionEvents([377788307885]).then((x) => {
+      getCollectionEvents(collectionIds).then((x) => {
         setCollectionEvents(x);
       }),
-      getMachineEvents([102893142411]).then((x) => {
+      getMachineEvents(machineIds).then((x) => {
         setMachineEvents(x);
       }),
-      getInstanceEvents([102893142411]).then((x) => {
+      getInstanceEvents(collectionIds, machineIds, instanceIds).then((x) => {
         setInstanceEvents(x);
       }),
     ]).finally(() => setIsLoading(false));
-  }, []);
+  }, [collectionIds, machineIds, instanceIds]);
 
-  console.log(collectionEvents);
+  const startDate = new Date(2019, 1, 2).getTime();
+
+  const collectionsStart = [];
+  const collectionsMid = [];
+  const collectionsEnd = [];
+  const collectionsStartTypes = new Set(["schedule", "enable", "submit"]);
+  const collectionsEndTypes = new Set(["kill", "finish", "fail"]);
+  for (const x of collectionEvents) {
+    if (collectionsStartTypes.has(x.type)) {
+      collectionsStart.push(x);
+    } else if (collectionsEndTypes.has(x.type)) {
+      collectionsEnd.push(x);
+    } else {
+      collectionsMid.push(x);
+    }
+  }
+
+  const machinesStart = [];
+  const machinesMid = [];
+  const machinesEnd = [];
+  const machinesStartTypes = new Set(["add"]);
+  const machinesEndTypes = new Set(["remove"]);
+  for (const x of machineEvents) {
+    if (machinesStartTypes.has(x.type)) {
+      machinesStart.push(x);
+    } else if (machinesEndTypes.has(x.type)) {
+      machinesEnd.push(x);
+    } else {
+      machinesMid.push(x);
+    }
+  }
+
+  const instancesStart = [];
+  const instancesMid = [];
+  const instancesEnd = [];
+  const instancesStartTypes = new Set(["submit", "schedule", "enable"]);
+  const instancesEndTypes = new Set([
+    "kill",
+    "finish",
+    "evict",
+    "fail",
+    "lost",
+  ]);
+  for (const x of instanceEvents) {
+    if (instancesStartTypes.has(x.type)) {
+      instancesStart.push(x);
+    } else if (instancesEndTypes.has(x.type)) {
+      instancesEnd.push(x);
+    } else {
+      instancesMid.push(x);
+    }
+  }
 
   return (
     <>
-      {isLoading ? (
-        <CircularProgress />
-      ) : (
-        <Plot
-          data={[
-            // {
-            //   x: [1, 2, 3],
-            //   y: [3, 3, 3],
-            //   type: "scatter",
-            //   mode: "markers",
-            //   marker: { symbol: "arrow-down", size: 15, color: "blue" },
-            // },
-            {
-              x: unpack(collectionEvents, "time"),
-              y: new Array(collectionEvents.length).fill(1),
-              type: "scatter",
-              mode: "box",
-              boxpoints: "all",
-              marker: { symbol: "arrow-down", size: 15, color: "blue" },
+      <Plot
+        data={[
+          {
+            x: unpack(collectionsStart, "time").map(
+              (x: number) => new Date(startDate + x / 1000)
+            ),
+            y: new Array(collectionsStart.length).fill(0.6),
+            text: collectionsStart.map(x => `Event: ${x.type}<br>Collection: ${x.collection_id}`),
+            type: "box",
+            mode: "box",
+            hoverinfo: "text",
+            boxpoints: "all",
+            marker: { symbol: "arrow-right", size: 15, color: "blue" },
+          },
+          {
+            x: unpack(machineEvents, "time").map(
+              (x: number) => new Date(startDate + x / 1000)
+            ),
+            y: new Array(machineEvents.length).fill(1),
+            text: [],
+            type: "box",
+            mode: "box",
+            hoverinfo: "text",
+            boxpoints: "all",
+            marker: { symbol: "arrow-down", size: 15, color: "red" },
+          },
+          {
+            x: unpack(instanceEvents, "time").map(
+              (x: number) => new Date(startDate + x / 1000)
+            ),
+            y: new Array(instanceEvents.length).fill(2),
+            text: [],
+            type: "box",
+            mode: "box",
+            hoverinfo: "text",
+            boxpoints: "all",
+            marker: { symbol: "arrow-down", size: 15, color: "green" },
+          },
+        ]}
+        layout={{
+          width: 1000,
+          height: 200,
+          showlegend: false,
+          yaxis: {
+            visible: false,
+            fixedrange: true,
+            range: [0, 3],
+          },
+          xaxis: {
+            rangeslider: {
+              borderwidth: 1,
+              thickness: 0.3,
             },
-            // {
-            //   x: [1.5, 2.5],
-            //   y: [1, 1],
-            //   type: "scatter",
-            //   mode: "markers",
-            //   marker: { symbol: "arrow-down", size: 15, color: "red" },
-            // },
-            // {
-            //   x: [1.75, 2.25],
-            //   y: [2, 2],
-            //   type: "scatter",
-            //   mode: "markers",
-            //   marker: { symbol: "arrow-down", size: 15, color: "green" },
-            // },
-            // {
-            //   x: [0, 2679000000000],
-            //   y: [0, 0],
-            //   type: "scatter",
-            //   mode: "lines",
-            //   marker: {},
-            // },
-          ]}
-          layout={{
-            width: 1000,
-            height: 200,
-            showlegend: false,
-            yaxis: {
-              visible: false,
-              fixedrange: true,
-            },
-            xaxis: {
-              rangeslider: {
-                borderwidth: 1,
-                thickness: 0.3,
-              },
-              range: [0, 2679000000000],
-            },
-            margin: {
-              b: 10,
-              l: 10,
-              r: 10,
-              t: 10,
-              pad: 5,
-            },
-            // shapes: [
-            //   {
-            //     type: "line",
-            //     x0: 1.5,
-            //     y0: 0,
-            //     x1: 1.5,
-            //     y1: 1.1,
-            //     line: {
-            //       color: "red",
-            //       width: 2,
-            //     },
-            //   },
-            //   {
-            //     type: "line",
-            //     x0: 1.75,
-            //     y0: 0,
-            //     x1: 1.75,
-            //     y1: 2.1,
-            //     line: {
-            //       color: "green",
-            //       width: 2,
-            //     },
-            //   },
-            //   {
-            //     type: "line",
-            //     x0: 1,
-            //     y0: 0,
-            //     x1: 1,
-            //     y1: 3.1,
-            //     line: {
-            //       color: "blue",
-            //       width: 2,
-            //     },
-            //   },
-            // ],
-          }}
-          onRelayout={(event) => {
-            const start = event["xaxis.range[0]"] || event["xaxis.range"]?.[0];
-            const end = event["xaxis.range[1]"] || event["xaxis.range"]?.[1];
-            console.log(start, end);
-          }}
-        />
-      )}
+            range: [new Date(2019, 0, 1), new Date(2019, 2, 6)], // Dates are shifted to start on 2019-01-02
+          },
+          margin: {
+            b: 10,
+            l: 10,
+            r: 10,
+            t: 10,
+            pad: 5,
+          },
+        }}
+        onRelayout={(event) => {
+          const start = event["xaxis.range[0]"] || event["xaxis.range"]?.[0];
+          const end = event["xaxis.range[1]"] || event["xaxis.range"]?.[1];
+          console.log(start, end);
+        }}
+      />
     </>
   );
 };

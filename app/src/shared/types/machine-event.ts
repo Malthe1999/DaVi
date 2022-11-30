@@ -7,6 +7,7 @@ export interface MachineEvent {
     platform_id: string
     switch_id: string
     time: number
+    type: string;
 }
 
 export type MachineEventResponse = {

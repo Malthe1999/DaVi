@@ -1,5 +1,8 @@
 import express, { Request, Response } from "express";
-import { instanceEvents, requestedInstances } from "./repository/instance-event";
+import {
+  instanceEvents,
+  requestedInstances,
+} from "./repository/instance-event";
 import * as MachineAttributeRepo from "./repository/machine-attribute";
 import * as CollectionRepo from "./repository/collection";
 import * as MachineRepo from "./repository/machine";
@@ -25,7 +28,7 @@ import {
   findByMachineId,
   memoryResources,
 } from "./repository/instance-usage";
-import {machineEvents} from "./repository/machine-event";
+import { machineEvents } from "./repository/machine-event";
 
 const router = express.Router();
 
@@ -191,37 +194,38 @@ router.get(
 
 router.get("/collection-events/:ids", async (req: Request, res: Response) =>
   collectionEvents(
-      req.params["ids"] !== undefined
-        ? req.params["ids"].split(",").map((x) => +x)
-        : []
-)
+    req.params["ids"] !== undefined
+      ? req.params["ids"].split(",").map((x) => +x)
+      : []
+  )
     .then((result) => res.status(200).json({ data: result }))
     .catch((err) => res.status(500).json({ errorMessage: err.message }))
 );
 
-router.get("/instance-events/:ids/:machine_events/:collection_events", async (req: Request, res: Response) =>
-  instanceEvents(
-      req.params["ids"] !== undefined
-        ? req.params["ids"].split(",").map((x) => +x)
+router.get(
+  "/instance-events/:collection_ids/:machine_ids/:ids",
+  async (req: Request, res: Response) =>
+    instanceEvents(
+      req.params["collection_ids"] !== undefined
+        ? req.params["collection_ids"].split(",").map((x) => +x)
         : [],
       req.params["machine_ids"] !== undefined
         ? req.params["machine_ids"].split(",").map((x) => +x)
         : [],
-
-      req.params["collection_ids"] !== undefined
-        ? req.params["collection_ids"].split(",").map((x) => +x)
+      req.params["ids"] !== undefined
+        ? req.params["ids"].split(",").map((x) => +x)
         : []
-)
-    .then((result) => res.status(200).json({ data: result }))
-    .catch((err) => res.status(500).json({ errorMessage: err.message }))
+    )
+      .then((result) => res.status(200).json({ data: result }))
+      .catch((err) => res.status(500).json({ errorMessage: err.message }))
 );
 
 router.get("/machine-events/:ids", async (req: Request, res: Response) =>
   machineEvents(
-      req.params["ids"] !== undefined
-        ? req.params["ids"].split(",").map((x) => +x)
-        : []
-)
+    req.params["ids"] !== undefined
+      ? req.params["ids"].split(",").map((x) => +x)
+      : []
+  )
     .then((result) => res.status(200).json({ data: result }))
     .catch((err) => res.status(500).json({ errorMessage: err.message }))
 );

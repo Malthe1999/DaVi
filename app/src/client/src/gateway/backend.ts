@@ -14,7 +14,10 @@ import {
   InstanceUsageResponse,
 } from "../../../shared/types/instance-usage";
 import { MachineAttributesResponse } from "../../../shared/types/machine-attributes";
-import { MachineEvent, MachineEventResponse } from "../../../shared/types/machine-event";
+import {
+  MachineEvent,
+  MachineEventResponse,
+} from "../../../shared/types/machine-event";
 import { MachineResult } from "../../../shared/types/machine";
 import { CollectionResult } from "../../../shared/types/collection";
 import { CollectionSizeResponse } from "../../../shared/types/collection-size";
@@ -150,6 +153,9 @@ export const memoryResources = async (
 };
 
 export const getCollectionEvents = async (ids: (number | string)[]) => {
+  if (ids.length === 0) {
+    return [];
+  }
   return getData<{ data: CollectionEvent[] }>(
     "collection-events/" + (ids ? ids.join(",") : "")
   )
@@ -158,6 +164,9 @@ export const getCollectionEvents = async (ids: (number | string)[]) => {
 };
 
 export const getMachineEvents = async (ids: (number | string)[]) => {
+  if (ids.length === 0) {
+    return [];
+  }
   return getData<{ data: MachineEvent[] }>(
     "machine-events/" + (ids ? ids.join(",") : "")
   )
@@ -165,9 +174,22 @@ export const getMachineEvents = async (ids: (number | string)[]) => {
     .catch((err) => Promise.reject(err as Error));
 };
 
-export const getInstanceEvents = async (ids: (number | string)[]) => {
+export const getInstanceEvents = async (
+  collection_ids: (number | string)[],
+  machine_ids: (number | string)[],
+  ids: (number | string)[]
+) => {
+  if (ids.length === 0) {
+    return [];
+  }
   return getData<{ data: InstanceEvent[] }>(
-    "instance-events/" + (ids ? ids.join(",") : "")
+    "instance-events/" +
+      (collection_ids ? collection_ids.join(",") : "") +
+      "/" +
+      (machine_ids ? machine_ids.join(",") : "") +
+      "/" +
+      (ids ? ids.join(",") : "") +
+      "/"
   )
     .then((res) => Promise.resolve(res.data))
     .catch((err) => Promise.reject(err as Error));

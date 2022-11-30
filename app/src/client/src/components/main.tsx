@@ -7,12 +7,15 @@ import {
   Select,
   TextField,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Parent } from "../../../shared/types/collection-event";
+import { collectionParents } from "../gateway/backend";
+import { Tree } from "../structs/tree";
 import TreeMap from "./better-treemap";
 import "./index.css";
 // @ts-ignore
 import { SideView } from "./side-view";
-import {TimeRangeSlider} from "./timerange-slider";
+import { TimeRangeSlider } from "./timerange-slider";
 
 export const Main = () => {
   const [clickedNodes, setClickedNodes] = useState<string[]>([
@@ -75,6 +78,37 @@ export const Main = () => {
   const [fromTime, setFromTime] = useState<number>(300000000);
   const [toTime, setToTime] = useState<number>(2679000000000);
   const [useDifferentColorScales, setUseDifferentColorScales] = useState(false);
+  const [eventFilters, setEventFilters] = useState<string[]>([]);
+  const [tree, setTree] = useState(new Tree("Cluster"));
+  const [parents, setParents] = useState(new Array<Parent>());
+
+  useEffect(() => {
+    collectionParents()
+      .then((parents) => setParents(parents))
+      .catch((err) => console.log(err));
+  }, []);
+
+  useEffect(() => {
+    let newTree = new Tree("Cluster");
+    for (const x of parents as Parent[]) {
+      let parent =
+        x.parent_collection_id === null
+          ? "Cluster"
+          : x.parent_collection_id.toString();
+
+      newTree.addEdge(parent, x.collection_id.toString(), false, null);
+    }
+    setTree(newTree);
+  }, [parents]);
+
+  const collectionIds = [eventFilters?.[0] ?? ""].filter(
+    (x) => x.length !== 0 && x !== "Cluster"
+  );
+  if (collectionIds.length !== 0) {
+    collectionIds.push(
+      ...tree.getParents(collectionIds[0]).filter((x) => x !== "Cluster")
+    );
+  }
 
   return (
     <>
@@ -85,7 +119,6 @@ export const Main = () => {
       >
         Borg Cluster
       </h1>
-      <TimeRangeSlider></TimeRangeSlider>
       <div className="custom-container">
         <FormControl>
           <InputLabel
@@ -128,7 +161,9 @@ export const Main = () => {
             control={
               <Checkbox
                 checked={useDifferentColorScales}
-                onChange={(event) => setUseDifferentColorScales(event.target.checked)}
+                onChange={(event) =>
+                  setUseDifferentColorScales(event.target.checked)
+                }
                 inputProps={{ "aria-label": "controlled" }}
               />
             }
@@ -143,6 +178,7 @@ export const Main = () => {
           fromTime={fromTime}
           toTime={toTime}
           useDifferentColorScales={useDifferentColorScales}
+          setEventFilters={setEventFilters}
         ></TreeMap>
         <SideView
           clickedNodes={clickedNodes}
@@ -153,6 +189,11 @@ export const Main = () => {
           fromTime={fromTime}
           toTime={toTime}
         ></SideView>
+        <TimeRangeSlider
+          collectionIds={collectionIds}
+          machineIds={[eventFilters?.[1] ?? ""].filter((x) => x.length !== 0)}
+          instanceIds={[eventFilters?.[2] ?? ""].filter((x) => x.length !== 0)}
+        ></TimeRangeSlider>
       </div>
     </>
   );

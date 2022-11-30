@@ -76,17 +76,18 @@ const requestedInstances = async (collection_ids: number[]) => {
 
 export { requestedInstances };
 
-export const instanceEvents = async (ids: number[], machine_ids: number[], collection_ids: number[]) => {
+export const instanceEvents = async (collection_ids: number[], machine_ids: number[], ids: number[]) => {
   const queryString = `
     SELECT *
     FROM instance_events
-    WHERE instance_index IN (${Array(ids.length)
-      .fill("?")
-      .join(",")})
-      AND collection_id IN (${Array(collection_ids.length)
+    WHERE
+      collection_id IN (${Array(collection_ids.length)
       .fill("?")
       .join(",")})
       AND machine_id IN (${Array(machine_ids.length)
+      .fill("?")
+      .join(",")})
+      AND instance_index IN (${Array(ids.length)
       .fill("?")
       .join(",")})
       `;
@@ -94,7 +95,7 @@ export const instanceEvents = async (ids: number[], machine_ids: number[], colle
   return dbAsync()
     .then((db) =>
       db
-        .query(queryString, ids)
+        .query(queryString, [...collection_ids, ...machine_ids, ...ids])
         .then((res) =>
           (res[0] as RowDataPacket[]).map((x: any) => x as InstanceEvent)
         )
