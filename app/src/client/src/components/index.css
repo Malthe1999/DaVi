@@ -43,3 +43,13 @@ svg.custom path.link {
 	stroke: #2593B8;
 	stroke-width: 1.5px;
 }
+
+.filters {
+	width: 600px;
+}
+
+.treemap-container {
+	height: 650px;
+	min-width: 500px;
+	margin-bottom: 10px;
+}

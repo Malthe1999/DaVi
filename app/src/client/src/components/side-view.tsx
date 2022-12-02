@@ -11,7 +11,7 @@ export const SideView = (props: {
   clickedNodes: string[];
   filteredNodes: string[];
   setClickedNodes: React.Dispatch<React.SetStateAction<string[]>>;
-  setFilteredNodes: React.Dispatch<React.SetStateAction<string[]>>;
+  setFilteredCollectionIds: React.Dispatch<React.SetStateAction<string[]>>;
   currentlySelectedNode: string;
   fromTime: number;
   toTime: number;
@@ -19,7 +19,7 @@ export const SideView = (props: {
   const {
     clickedNodes,
     setClickedNodes,
-    setFilteredNodes,
+    setFilteredCollectionIds: setFilteredNodes,
     currentlySelectedNode,
     filteredNodes,
   } = props;
@@ -73,10 +73,10 @@ export const SideView = (props: {
   }, [clickedNodes, parents, currentlySelectedNode]);
 
   return (
-    <div className="custom-container" style={{marginTop: 800}}>
+    <div className="custom-container">
       <TreeGraph
         data={tree.root}
-        height={600}
+        height={550}
         svgProps={{
           className: "custom",
         }}

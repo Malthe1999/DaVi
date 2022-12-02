@@ -96,8 +96,8 @@ const TreeMap = (props: {
             },
           ]}
           layout={{
-            width: 800,
-            height: 800,
+            width: 900,
+            height: 650,
             margin: {
               b: 0,
               l: 0,

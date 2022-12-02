@@ -5,18 +5,18 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  TextField,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Parent } from "../../../shared/types/collection-event";
 import { collectionParents } from "../gateway/backend";
 import { Tree } from "../structs/tree";
-import TreeMap from "./better-treemap";
+import BetterTreemap from "./better-treemap";
+import EventsBox from "./events-box";
 import Histogram from "./histogram";
 import "./index.css";
 // @ts-ignore
 import { SideView } from "./side-view";
-import { TimeRangeSlider } from "./timerange-slider";
+import TimeRangeSlider from "./timerange-slider";
 
 export const Main = () => {
   const [clickedNodes, setClickedNodes] = useState<string[]>([
@@ -37,7 +37,7 @@ export const Main = () => {
     "383608861807",
     "384616480023",
   ]);
-  const [filteredNodes, setFilteredNodes] = useState<string[]>([
+  const [filteredCollectionIds, setFilteredCollectionIds] = useState<string[]>([
     "377787092035",
     "377797560396",
     "383195444727",
@@ -122,64 +122,62 @@ export const Main = () => {
         Borg Cluster
       </h1>
       <div className="custom-container">
-        <FormControl>
-          <InputLabel
-            style={{
-              color: "white",
-            }}
-          >
-            Resource
-          </InputLabel>
-          <Select
-            style={{
-              color: "white",
-            }}
-            value={viewedResource}
-            label="Resource"
-            onChange={(event) => setViewedResource(event.target.value)}
-          >
-            <MenuItem value={"cpu"}>CPU</MenuItem>
-            <MenuItem value={"mem"}>RAM</MenuItem>
-          </Select>
-          <TextField
-            id="outlined-basic"
-            label="From Time"
-            variant="standard"
-            value={fromTime}
-            onChange={(event) => {
-              setFromTime(+event.target.value);
-            }}
+        <div className="filters">
+          <FormControl>
+            <InputLabel
+              style={{
+                color: "white",
+              }}
+            >
+              Resource
+            </InputLabel>
+            <Select
+              style={{
+                color: "white",
+              }}
+              value={viewedResource}
+              label="Resource"
+              onChange={(event) => setViewedResource(event.target.value)}
+            >
+              <MenuItem value={"cpu"}>CPU</MenuItem>
+              <MenuItem value={"mem"}>RAM</MenuItem>
+            </Select>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={useDifferentColorScales}
+                  onChange={(event) =>
+                    setUseDifferentColorScales(event.target.checked)
+                  }
+                  inputProps={{ "aria-label": "controlled" }}
+                />
+              }
+              label="Use different color scales for Collections, Machines, and Instances"
+            />
+          </FormControl>
+          <TimeRangeSlider
+            setToTime={setToTime}
+            setFromTime={setFromTime}
+            filteredCollectionIds={filteredCollectionIds}
           />
-          <TextField
-            id="outlined-basic"
-            label="To Time"
-            variant="standard"
-            value={toTime}
-            onChange={(event) => {
-              setToTime(+event.target.value);
-            }}
+          <SideView
+            clickedNodes={clickedNodes}
+            filteredNodes={filteredCollectionIds}
+            setClickedNodes={setClickedNodes}
+            setFilteredCollectionIds={setFilteredCollectionIds}
+            currentlySelectedNode={currentlySelectedNode}
+            fromTime={fromTime}
+            toTime={toTime}
           />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={useDifferentColorScales}
-                onChange={(event) =>
-                  setUseDifferentColorScales(event.target.checked)
-                }
-                inputProps={{ "aria-label": "controlled" }}
-              />
-            }
-            label="Use different color scales for Collections, Machines, and Instances"
-          />
-        </FormControl>
-        <div>
-          <Histogram
+        </div>
+        <div className="treemap-container">
+          {/* <Histogram
             fromTime={fromTime}
             toTime={toTime}
             showHistogram={showHistogram}
-          ></Histogram>
-          <TreeMap
-            filteredNodes={filteredNodes}
+          /> */}
+          <BetterTreemap
+            filteredNodes={filteredCollectionIds}
             setCurrentlySelectedNode={setCurrentlySelectedNode}
             viewedResource={viewedResource}
             fromTime={fromTime}
@@ -187,25 +185,17 @@ export const Main = () => {
             useDifferentColorScales={useDifferentColorScales}
             setShowHistogram={setShowHistogram}
             setEventFilters={setEventFilters}
-          ></TreeMap>
+          />
         </div>
-        <SideView
-          clickedNodes={clickedNodes}
-          filteredNodes={filteredNodes}
-          setClickedNodes={setClickedNodes}
-          setFilteredNodes={setFilteredNodes}
-          currentlySelectedNode={currentlySelectedNode}
-          fromTime={fromTime}
-          toTime={toTime}
-        />
-
-        <TimeRangeSlider
-          collectionIds={collectionIds}
-          machineIds={[eventFilters?.[1] ?? ""].filter((x) => x.length !== 0)}
-          instanceIds={[eventFilters?.[2] ?? ""].filter((x) => x.length !== 0)}
-          setToTime={setToTime}
-          setFromTime={setFromTime}
-        ></TimeRangeSlider>
+        <div>
+          <EventsBox
+            collectionIds={collectionIds}
+            machineIds={[eventFilters?.[1] ?? ""].filter((x) => x.length !== 0)}
+            instanceIds={[eventFilters?.[2] ?? ""].filter(
+              (x) => x.length !== 0
+            )}
+          />
+        </div>
       </div>
     </>
   );
