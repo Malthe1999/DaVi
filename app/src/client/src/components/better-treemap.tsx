@@ -3,6 +3,7 @@ import Plot from "react-plotly.js";
 import {
   collectionParents,
   cpuResources,
+  getCollectionAttributes,
   memoryResources,
 } from "../gateway/backend";
 import { unpack } from "../util/unpack";
@@ -33,6 +34,9 @@ const TreeMap = (props: {
   const [isLoading, setIsLoading] = useState(true);
   const [dataPoints, setDataPoints] = useState<any[]>([]);
   const [allParents, setAllParents] = useState<{ [key: string]: string }>({});
+  const [collectionAttributes, setCollectionAttributes] = useState<{
+    [key: string]: string;
+  }>({});
   const [allResourceUsage, setAllResourceUsage] = useState<ResourceUsage[]>([]);
 
   useEffect(() => {
@@ -44,6 +48,19 @@ const TreeMap = (props: {
         ).toString();
       }
       setAllParents(parents);
+    });
+  }, []);
+
+  useEffect(() => {
+    getCollectionAttributes().then((res) => {
+      const collectionAttributes: { [key: string]: string } = {}; // TODO fix type
+      for (const collectionAttribute of res) {
+        collectionAttributes[collectionAttribute.collection_id.toString()] =
+          collectionAttribute// TODO fix field
+          .attributes // TODO fix field
+            .toString();
+      }
+      setCollectionAttributes(collectionAttributes);
     });
   }, []);
 
@@ -69,13 +86,30 @@ const TreeMap = (props: {
         collection(x),
         undefined,
         "collection",
+        collectionAttributes[x.collection_id.toString()]
+      );
+      tree.addEdge(
+        collection(x),
+        machine(x),
+        undefined,
+        "machine",
         x.information_listing
       );
-      tree.addEdge(collection(x), machine(x), undefined, "machine", x.information_listing);
-      tree.addEdge(machine(x), instance(x), x.resource_usage, "instance", x.information_listing);
+      tree.addEdge(
+        machine(x),
+        instance(x),
+        x.resource_usage,
+        "instance",
+        x.information_listing
+      );
     }
     setDataPoints(tree.toDataPoints(useDifferentColorScales));
-  }, [allResourceUsage, allParents, useDifferentColorScales]);
+  }, [
+    allResourceUsage,
+    allParents,
+    useDifferentColorScales,
+    collectionAttributes,
+  ]);
 
   return (
     <>
@@ -122,11 +156,14 @@ const TreeMap = (props: {
               ).toString()
             );
             if (
-              ((x.data[0] as any)["level"]?.toString().match(/\-/g) || []).length == 2
+              ((x.data[0] as any)["level"]?.toString().match(/\-/g) || [])
+                .length == 2
             ) {
-              setShowHistogram((x.data[0] as any)["level"]?.split("-").map((x: string) => +x))
+              setShowHistogram(
+                (x.data[0] as any)["level"]?.split("-").map((x: string) => +x)
+              );
             } else {
-              setShowHistogram([])
+              setShowHistogram([]);
             }
           }}
         />

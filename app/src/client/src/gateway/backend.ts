@@ -154,7 +154,7 @@ export const memoryResources = async (
 };
 
 export const cpuHistogram = async (
-  collection_id?: (number | string),
+  collection_id?: number | string,
   instance_index?: number,
   fromTime?: number,
   toTime?: number
@@ -211,6 +211,15 @@ export const getInstanceEvents = async (
       "/" +
       (ids ? ids.join(",") : "") +
       "/"
+  )
+    .then((res) => Promise.resolve(res.data))
+    .catch((err) => Promise.reject(err as Error));
+};
+
+export const getCollectionAttributes = async () => {
+
+  return getData<{ data: string[] }>( // TODO proper type
+    "collection-attributes/" // TODO
   )
     .then((res) => Promise.resolve(res.data))
     .catch((err) => Promise.reject(err as Error));
