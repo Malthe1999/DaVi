@@ -171,11 +171,11 @@ export const Main = () => {
           />
         </div>
         <div className="treemap-container">
-          {/* <Histogram
+          { <Histogram
             fromTime={fromTime}
             toTime={toTime}
             showHistogram={showHistogram}
-          /> */}
+          /> }
           <BetterTreemap
             filteredNodes={filteredCollectionIds}
             setCurrentlySelectedNode={setCurrentlySelectedNode}

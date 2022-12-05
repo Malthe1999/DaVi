@@ -56,7 +56,10 @@ export const cpuResources = async (
   let queryString = "";
   if (collection_ids.length > 0) {
     queryString = `
-      SELECT collection_id, machine_id, instance_index, SUM(average_cpu*(end_time - start_time)) AS resource_usage
+      SELECT collection_id, machine_id, instance_index, SUM(average_cpu*(end_time - start_time)) AS resource_usage,
+       CONCAT('Average CPU-usage: ', AVG(average_cpu), '<br>' , 'Average Memory-usage: ', AVG(average_mem),
+       '<br>' , 'Maximum CPU-usage: ', MAX(maximum_cpu), '<br>' , 'Maximum Memory-usage: ', AVG(maximum_mem),
+       '<br>' , 'Average Assigned Memory: ', AVG(assigned_memory), '<br>' , 'Sample Rate: ', AVG(sample_rate)) as information_listing
       FROM instance_usage
       ${
         fromTime !== undefined && toTime !== undefined
@@ -69,7 +72,7 @@ export const cpuResources = async (
       )`;
   } else {
     queryString = `
-      SELECT collection_id, machine_id, instance_index, SUM(average_cpu*(end_time - start_time)) AS resource_usage
+      SELECT collection_id, machine_id, instance_index, SUM(average_cpu*(end_time - start_time)) AS resource_usage, AVG(average_cpu) as information_listing
       FROM instance_usage
       ${
         fromTime !== undefined && toTime !== undefined
@@ -91,7 +94,8 @@ export const cpuResources = async (
                 x["collection_id"].toString(),
                 x["machine_id"].toString(),
                 x["instance_index"].toString(),
-                +x["resource_usage"]
+                +x["resource_usage"],
+                x["information_listing"].toString()
               )
           )
         )

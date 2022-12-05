@@ -22,6 +22,7 @@ export class ResourceTree {
       name: rootName,
       parent: undefined,
       children: [],
+      information_listing: "",
     };
     this.pointers = {};
     this.pointers[rootName] = this.root;
@@ -31,7 +32,8 @@ export class ResourceTree {
     parent: string,
     child: string,
     resourceUsage?: number,
-    type?: string
+    type?: string,
+    information_listing?: string
   ) {
     if (this.pointers[child] === undefined) {
       this.pointers[child] = {
@@ -40,6 +42,7 @@ export class ResourceTree {
         children: [],
         resourceUsage: resourceUsage,
         type: type,
+        information_listing: information_listing,
       };
     }
 
@@ -48,6 +51,7 @@ export class ResourceTree {
         name: parent,
         parent: undefined,
         children: [this.pointers[child]],
+        information_listing: information_listing,
       };
     } else if (!this.pointers[parent].children.find((x) => x.name === child)) {
       this.pointers[parent].children.push(this.pointers[child]);
@@ -137,6 +141,7 @@ export class ResourceTree {
         parent: node.parent?.name ?? "", // Cluster has no parent
         nodeSize: node.nodeSize,
         color: color.hex(),
+        informationListing: node.information_listing
       });
     }
     return result;
@@ -152,4 +157,5 @@ interface Node {
   nodeSize?: number;
   resourceUsage?: number;
   type?: string;
+  information_listing?: string;
 }

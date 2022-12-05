@@ -17,40 +17,35 @@ const Histogram = (props: {
     showHistogram
   } = props;
   const [isLoading, setIsLoading] = useState(true);
-  const [allHistogram, setAallHistogram] = useState<HistogramUsage[]>([]);
+  const [allHistogram, setAllHistogram] = useState<HistogramUsage[]>([]);
 
   useEffect(() => {
     if (showHistogram.length === 3) {
       cpuHistogram(showHistogram[0],showHistogram[2], fromTime, toTime)
-        .then((res) => setAallHistogram(res))
+        .then((res) => setAllHistogram(res))
         .finally(() => setIsLoading(false));
     } else {
-      setAallHistogram([])
-      console.log("Invalid resource type");
+      setAllHistogram([])
+      setIsLoading(true)
     }
   }, [showHistogram[0], showHistogram[2], fromTime, toTime]);
   return (
     <>
       {isLoading ? (
-        <CircularProgress />
+        <div/>
       ) : (
         <Plot
           data={[
             {
+              opacity: 0.4,
               x: unpack(allHistogram, "average_cpu"),
               type: "histogram",
+              histnorm: "",
             },
           ]}
           layout={{
             width: 800,
             height: 800,
-            margin: {
-              b: 0,
-              l: 0,
-              r: 0,
-              t: 0,
-              pad: 0,
-            },
           }}
         />
       )}

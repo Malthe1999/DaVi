@@ -15,8 +15,8 @@ export interface InstanceUsage {
   random_sample_mem: number;
   assigned_memory: number;
   page_cache_memory: number;
-  cycles_per_instruction: number;
-  memory_accesses_per_instruction: number;
+  cycles_per_instruction: number; //CANT USE
+  memory_accesses_per_instruction: number; //CANT USE
   sample_rate: number;
   cpu_usage_distribution: string;
   tail_cpu_usage_distribution: string;

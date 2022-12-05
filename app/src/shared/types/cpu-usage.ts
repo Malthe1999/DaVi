@@ -4,6 +4,7 @@ export interface CpuUsage {
     cpuusage: number 
     nodeScale: number 
     color: string
+    informationListing: string[]
 }
 
 export type CpuUsageResponse = {

@@ -68,10 +68,11 @@ const TreeMap = (props: {
         allParents[x.collection_id],
         collection(x),
         undefined,
-        "collection"
+        "collection",
+        x.information_listing
       );
-      tree.addEdge(collection(x), machine(x), undefined, "machine");
-      tree.addEdge(machine(x), instance(x), x.resource_usage, "instance");
+      tree.addEdge(collection(x), machine(x), undefined, "machine", x.information_listing);
+      tree.addEdge(machine(x), instance(x), x.resource_usage, "instance", x.information_listing);
     }
     setDataPoints(tree.toDataPoints(useDifferentColorScales));
   }, [allResourceUsage, allParents, useDifferentColorScales]);
@@ -93,6 +94,8 @@ const TreeMap = (props: {
               branchvalues: "remainder",
               maxdepth: 2,
               marker: { colors: unpack(dataPoints, "color") },
+              hovertext: unpack(dataPoints, "informationListing"),
+              hoverinfo: "text",
             },
           ]}
           layout={{
