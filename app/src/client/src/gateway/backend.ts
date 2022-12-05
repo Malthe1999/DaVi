@@ -25,6 +25,7 @@ import { CpuUsage, CpuUsageResponse } from "../../../shared/types/cpu-usage";
 import { CollectionSpreadResponse } from "../../../shared/types/collection-spread";
 import { ResourceUsage } from "../../../shared/types/resource-usage";
 import { HistogramUsage } from "../../../shared/types/histogram-data";
+import { CollectionInfo } from "../../../shared/types/collection-info";
 
 export const getData = async <T>(resource: string): Promise<T> => {
   const res = await fetch(`http://localhost:17500/api/${resource}`, {
@@ -218,9 +219,10 @@ export const getInstanceEvents = async (
 
 export const getCollectionAttributes = async () => {
 
-  return getData<{ data: string[] }>( // TODO proper type
+  return getData<{ data: CollectionInfo[] }>( // TODO proper type
     "collection-attributes/" // TODO
   )
     .then((res) => Promise.resolve(res.data))
     .catch((err) => Promise.reject(err as Error));
 };
+

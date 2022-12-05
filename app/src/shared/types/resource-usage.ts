@@ -4,7 +4,7 @@ export class ResourceUsage {
   instance_index: string;
   resource_usage: number;
   information_listing: string;
-
+  
   constructor(
     collection_id: string,
     machine_id: string,

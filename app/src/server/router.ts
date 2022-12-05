@@ -30,7 +30,7 @@ import {
   memoryResources,
 } from "./repository/instance-usage";
 import { machineEvents } from "./repository/machine-event";
-
+import {findCollectionInfo} from "./repository/collection-info"
 const router = express.Router();
 
 router.get("/", async (req: Request, res: Response) => {
@@ -245,6 +245,12 @@ router.get("/machine-events/:ids", async (req: Request, res: Response) =>
       ? req.params["ids"].split(",").map((x) => +x)
       : []
   )
+    .then((result) => res.status(200).json({ data: result }))
+    .catch((err) => res.status(500).json({ errorMessage: err.message }))
+);
+
+router.get("/collection-attributes", async (req: Request, res: Response) =>
+  findCollectionInfo()
     .then((result) => res.status(200).json({ data: result }))
     .catch((err) => res.status(500).json({ errorMessage: err.message }))
 );

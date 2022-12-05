@@ -55,10 +55,9 @@ const TreeMap = (props: {
     getCollectionAttributes().then((res) => {
       const collectionAttributes: { [key: string]: string } = {}; // TODO fix type
       for (const collectionAttribute of res) {
-        collectionAttributes[collectionAttribute.collection_id.toString()] =
-          collectionAttribute// TODO fix field
-          .attributes // TODO fix field
-            .toString();
+        console.log(res)
+        collectionAttributes[collectionAttribute.id?.toString()] =
+          collectionAttribute.priority?.toString();
       }
       setCollectionAttributes(collectionAttributes);
     });
@@ -80,6 +79,8 @@ const TreeMap = (props: {
 
   useEffect(() => {
     const tree = new ResourceTree("Cluster");
+    console.log("Col Atr")
+    console.log(collectionAttributes)
     for (const x of allResourceUsage) {
       tree.addEdge(
         allParents[x.collection_id],
