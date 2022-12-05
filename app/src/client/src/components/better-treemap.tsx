@@ -20,6 +20,8 @@ const TreeMap = (props: {
   useDifferentColorScales: boolean;
   setShowHistogram: React.Dispatch<React.SetStateAction<number[]>>;
   setEventFilters: React.Dispatch<React.SetStateAction<string[]>>;
+  nameMap: { [key: string]: string };
+  reverseNameMap: { [key: string]: string };
 }) => {
   const {
     setCurrentlySelectedNode,
@@ -30,6 +32,8 @@ const TreeMap = (props: {
     useDifferentColorScales,
     setShowHistogram,
     setEventFilters,
+    nameMap,
+    reverseNameMap,
   } = props;
   const [isLoading, setIsLoading] = useState(true);
   const [dataPoints, setDataPoints] = useState<any[]>([]);
@@ -55,7 +59,6 @@ const TreeMap = (props: {
     getCollectionAttributes().then((res) => {
       const collectionAttributes: { [key: string]: string } = {}; // TODO fix type
       for (const collectionAttribute of res) {
-        console.log(res)
         collectionAttributes[collectionAttribute.id?.toString()] =
           collectionAttribute.priority?.toString();
       }
@@ -78,9 +81,7 @@ const TreeMap = (props: {
   }, [filteredNodes, viewedResource, fromTime, toTime]);
 
   useEffect(() => {
-    const tree = new ResourceTree("Cluster");
-    console.log("Col Atr")
-    console.log(collectionAttributes)
+    const tree = new ResourceTree("Cluster", nameMap);
     for (const x of allResourceUsage) {
       tree.addEdge(
         allParents[x.collection_id],

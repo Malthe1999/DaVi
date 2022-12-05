@@ -5,7 +5,8 @@ import "./index.css";
 // @ts-ignore
 import { Tree as TreeGraph } from "react-tree-graph";
 import { Tree } from "../structs/tree";
-import _ from "lodash";
+import _, { reverse } from "lodash";
+import { randomNameAdj } from "../util/name-generator";
 
 export const SideView = (props: {
   clickedNodes: string[];
@@ -15,6 +16,8 @@ export const SideView = (props: {
   currentlySelectedNode: string;
   fromTime: number;
   toTime: number;
+  nameMap: { [key: string]: string };
+  reverseNameMap: { [key: string]: string };
 }) => {
   const {
     clickedNodes,
@@ -22,7 +25,10 @@ export const SideView = (props: {
     setFilteredCollectionIds: setFilteredNodes,
     currentlySelectedNode,
     filteredNodes,
+    nameMap,
+    reverseNameMap,
   } = props;
+
   const [tree, setTree] = useState(new Tree("Cluster"));
   const [parents, setParents] = useState(new Array<Parent>());
 
@@ -34,7 +40,7 @@ export const SideView = (props: {
   }, []);
 
   useEffect(() => {
-    if (parents.length === 0) {
+    if (parents.length === 0 || Object.values(nameMap ?? {}).length === 0) {
       return;
     }
     // Update the highlighted nodes
@@ -46,15 +52,16 @@ export const SideView = (props: {
           : x.parent_collection_id.toString();
 
       newTree.addEdge(
-        parent,
-        x.collection_id.toString(),
+        nameMap[parent],
+        nameMap[x.collection_id.toString()],
         clickedNodes.includes(x.collection_id.toString()), // Only highlights the current node
         (child: string) => {
           // Add/remove current node from clicked
-          if (!clickedNodes.includes(child)) {
-            setClickedNodes([...clickedNodes, child]);
+          const id = reverseNameMap[child];
+          if (!clickedNodes.includes(id)) {
+            setClickedNodes([...clickedNodes, id]);
           } else {
-            setClickedNodes([...clickedNodes.filter((x) => x !== child)]);
+            setClickedNodes([...clickedNodes.filter((x) => x !== id)]);
           }
         }
       );
@@ -65,12 +72,17 @@ export const SideView = (props: {
     newTree.emphasize(currentlySelectedNode);
     const newFilteredNodes = newTree
       .getHighlighted()
-      .filter((x) => x != "Cluster");
+      .filter((x) => x != "Cluster").map(x => reverseNameMap[x]);
     if (!_.isEqual(filteredNodes, newFilteredNodes)) {
-      setFilteredNodes(newTree.getHighlighted().filter((x) => x != "Cluster"));
+      setFilteredNodes(
+        newTree
+          .getHighlighted()
+          .filter((x) => x != "Cluster")
+          .map((x) => reverseNameMap[x])
+      );
     }
     setTree(newTree);
-  }, [clickedNodes, parents, currentlySelectedNode]);
+  }, [clickedNodes, parents, currentlySelectedNode, nameMap, reverseNameMap]);
 
   return (
     <div className="custom-container">

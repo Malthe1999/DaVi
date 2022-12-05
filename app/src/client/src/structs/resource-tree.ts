@@ -1,5 +1,9 @@
 import chroma from "chroma-js";
-import {randomNameAdj, randomNameAni, randomNameCol} from '../util/name-generator';
+import {
+  randomNameAdj,
+  randomNameAni,
+  randomNameCol,
+} from "../util/name-generator";
 
 const collectionColorScheme = (max: number) =>
   chroma.scale("Blues").domain([0, Math.log(max)]);
@@ -16,8 +20,9 @@ const generalColorScale = (max: number) =>
 export class ResourceTree {
   root: Node;
   pointers: { [key: string]: Node };
+  nameMap: { [key: string]: string };
 
-  constructor(rootName: string) {
+  constructor(rootName: string, nameMap: { [key: string]: string }) {
     this.root = {
       name: rootName,
       parent: undefined,
@@ -26,6 +31,7 @@ export class ResourceTree {
     };
     this.pointers = {};
     this.pointers[rootName] = this.root;
+    this.nameMap = nameMap;
   }
 
   addEdge(
@@ -112,28 +118,26 @@ export class ResourceTree {
       if (useDifferentColorScales) {
         if (node.type === "collection") {
           color = collection(Math.log(node.resourceUsage!));
-        }
-        else if (node.type === "machine") {
+        } else if (node.type === "machine") {
           color = machine(Math.log(node.resourceUsage!));
-        }
-        else if (node.type === "instance") {
+        } else if (node.type === "instance") {
           color = instance(Math.log(node.resourceUsage!));
-        }
-        else {
+        } else {
           color = other(Math.log(node.resourceUsage!));
         }
       }
       if (node.type === "collection") {
-        label = randomNameAdj(node.name!)
-      }
-      else if (node.type === "machine") {
-        label = randomNameCol(node.name!)
-      }
-      else if (node.type === "instance") {
-        label = randomNameAni(node.name!)
-      }
-      else {
-        label = "Cluster"
+        if (this.nameMap[node.name!] !== undefined) {
+          label = this.nameMap[node.name!];
+        } else {
+          label = randomNameAdj(node.name!);
+        }
+      } else if (node.type === "machine") {
+        label = randomNameCol(node.name!);
+      } else if (node.type === "instance") {
+        label = randomNameAni(node.name!);
+      } else {
+        label = "Cluster";
       }
       result.push({
         label: label,
@@ -141,7 +145,7 @@ export class ResourceTree {
         parent: node.parent?.name ?? "", // Cluster has no parent
         nodeSize: node.nodeSize,
         color: color.hex(),
-        informationListing: node.information_listing
+        informationListing: node.information_listing,
       });
     }
     return result;

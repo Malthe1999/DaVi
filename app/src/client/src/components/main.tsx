@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { Parent } from "../../../shared/types/collection-event";
 import { collectionParents } from "../gateway/backend";
 import { Tree } from "../structs/tree";
+import {randomNameAdj} from "../util/name-generator";
 import BetterTreemap from "./better-treemap";
 import EventsBox from "./events-box";
 import Histogram from "./histogram";
@@ -83,6 +84,38 @@ export const Main = () => {
   const [eventFilters, setEventFilters] = useState<string[]>([]);
   const [tree, setTree] = useState(new Tree("Cluster"));
   const [parents, setParents] = useState(new Array<Parent>());
+
+  const [nameMap, setNameMap] = useState<{ [key: string]: string }>({});
+  const [reverseNameMap, setReverseNameMap] = useState<{
+    [key: string]: string;
+  }>({});
+
+  useEffect(() => {
+    // Load parents once
+    collectionParents()
+      .then((parents) => {
+        const map: { [key: string]: string } = {};
+        const reverseMap: { [key: string]: string } = {};
+
+        map["Cluster"] = "Cluster";
+        reverseMap["Cluster"] = "Cluster";
+        let counter = 1;
+        for (const parent of parents) {
+          map[parent.collection_id.toString()] = `${randomNameAdj(
+            parent.collection_id.toString()
+          )} (${counter})`;
+
+          reverseMap[
+            `${randomNameAdj(parent.collection_id.toString())} (${counter})`
+          ] = parent.collection_id.toString();
+          counter += 1;
+        }
+
+        setNameMap(map);
+        setReverseNameMap(reverseMap);
+      })
+      .catch((err) => console.log(err));
+  }, []);
 
   useEffect(() => {
     collectionParents()
@@ -168,6 +201,8 @@ export const Main = () => {
             currentlySelectedNode={currentlySelectedNode}
             fromTime={fromTime}
             toTime={toTime}
+            nameMap={nameMap}
+            reverseNameMap={reverseNameMap}
           />
         </div>
         <div className="treemap-container">
@@ -185,6 +220,8 @@ export const Main = () => {
             useDifferentColorScales={useDifferentColorScales}
             setShowHistogram={setShowHistogram}
             setEventFilters={setEventFilters}
+            nameMap={nameMap}
+            reverseNameMap={reverseNameMap}
           />
         </div>
         <div>
