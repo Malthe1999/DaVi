@@ -5,9 +5,10 @@ import { CollectionInfo } from "../../shared/types/collection-info";
 
 export const findCollectionInfo = async() => {
   const queryString = `
-    SELECT AVG(priority) as priority, collection_id as id
-    FROM collection_events 
-    GROUP BY collection_id`;
+    SELECT collection_id as id,
+    CONCAT('Priority rating: ', priority, '<br>' , 'Vertical scaling: ', vertical_scaling,
+        '<br>' , 'Scheduling class: ', scheduling_class) as information_listing
+    FROM collection_events`;
 
     return await dbAsync()
     .then((db) =>

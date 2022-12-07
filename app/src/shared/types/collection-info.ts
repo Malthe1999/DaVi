@@ -1,6 +1,6 @@
 export interface CollectionInfo {
     id: number
-    priority: number
+    information_listing: string
 }
 
 export type CollectionInfoResponse = {

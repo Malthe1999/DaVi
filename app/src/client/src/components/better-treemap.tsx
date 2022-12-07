@@ -60,7 +60,7 @@ const TreeMap = (props: {
       const collectionAttributes: { [key: string]: string } = {}; // TODO fix type
       for (const collectionAttribute of res) {
         collectionAttributes[collectionAttribute.id?.toString()] =
-          collectionAttribute.priority?.toString();
+          collectionAttribute.information_listing?.toString();
       }
       setCollectionAttributes(collectionAttributes);
     });
@@ -95,7 +95,7 @@ const TreeMap = (props: {
         machine(x),
         undefined,
         "machine",
-        x.information_listing
+        ""
       );
       tree.addEdge(
         machine(x),
