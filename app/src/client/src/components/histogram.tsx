@@ -44,8 +44,8 @@ const Histogram = (props: {
             },
           ]}
           layout={{
-            width: 800,
-            height: 800,
+            width: 880,
+            height: 620,
           }}
         />
       )}

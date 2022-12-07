@@ -52,4 +52,21 @@ svg.custom path.link {
 	height: 650px;
 	min-width: 500px;
 	margin-bottom: 10px;
+	position: absolute;
+	left: 610px;
+}
+.histogram-container {
+	height: 100px;
+	width: 100px;
+	position: absolute;
+	left: 620px;
+	bottom: 705px;
+}
+.eventbox-container {
+	height: 650px;
+	min-width: 500px;
+	margin-bottom: 10px;
+	position: absolute;
+	left: 610px;
+	bottom: -500px;
 }

@@ -206,11 +206,6 @@ export const Main = () => {
           />
         </div>
         <div className="treemap-container">
-          { <Histogram
-            fromTime={fromTime}
-            toTime={toTime}
-            showHistogram={showHistogram}
-          /> }
           <BetterTreemap
             filteredNodes={filteredCollectionIds}
             setCurrentlySelectedNode={setCurrentlySelectedNode}
@@ -224,7 +219,15 @@ export const Main = () => {
             reverseNameMap={reverseNameMap}
           />
         </div>
-        <div>
+        <div className="histogram-container">
+          { <Histogram
+            fromTime={fromTime}
+            toTime={toTime}
+            showHistogram={showHistogram}
+          /> }
+        </div>
+        
+        <div className="eventbox-container">
           <EventsBox
             collectionIds={collectionIds}
             machineIds={[eventFilters?.[1] ?? ""].filter((x) => x.length !== 0)}
