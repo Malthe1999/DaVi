@@ -149,7 +149,7 @@ export const Main = () => {
     <>
       <h1
         style={{
-          color: "white",
+          marginLeft: '20px',
         }}
       >
         Borg Cluster
@@ -158,16 +158,10 @@ export const Main = () => {
         <div className="filters">
           <FormControl>
             <InputLabel
-              style={{
-                color: "white",
-              }}
             >
               Resource
             </InputLabel>
             <Select
-              style={{
-                color: "white",
-              }}
               value={viewedResource}
               label="Resource"
               onChange={(event) => setViewedResource(event.target.value)}

@@ -69,7 +69,7 @@ export const SideView = (props: {
 
     // Highlight all nodes on a path from the root to a clicked node
     newTree.highlightParents();
-    newTree.emphasize(currentlySelectedNode);
+    newTree.emphasize(nameMap[currentlySelectedNode]);
     const newFilteredNodes = newTree
       .getHighlighted()
       .filter((x) => x != "Cluster").map(x => reverseNameMap[x]);

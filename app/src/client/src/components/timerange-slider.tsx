@@ -14,6 +14,7 @@ const TimeRangeSlider = (props: {
   const [allCollectionEvents, setAllCollectionEvents] = useState<
     CollectionEvent[]
   >([]);
+  const [priorities, setPriorities] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     Promise.all([
@@ -23,6 +24,23 @@ const TimeRangeSlider = (props: {
     ]);
   }, [filteredCollectionIds]);
 
+  useEffect(() => {
+    const newPriorities: { [key: string]: number } = {};
+    let changeOccurred = false;
+    for (const x of allCollectionEvents) {
+      if (priorities[x.collection_id] === undefined) {
+        newPriorities[x.collection_id] = Math.log(x.priority - 100) + Math.random() * 1.5 + 0.75;
+        changeOccurred = true;
+      } else {
+        newPriorities[x.collection_id] = priorities[x.collection_id];
+      }
+    }
+
+    if (changeOccurred) {
+      setPriorities(newPriorities);
+    }
+  }, [allCollectionEvents]);
+
   const startDate = new Date(2019, 0, 2).getTime();
 
   const collectionsStart = [];
@@ -30,6 +48,7 @@ const TimeRangeSlider = (props: {
   for (const x of allCollectionEvents) {
     if (collectionsStartTypes.has(x.type)) {
       collectionsStart.push(x);
+      collectionsStart[collectionsStart.length - 1].priority = priorities[x.collection_id];
     }
   }
 
@@ -42,9 +61,7 @@ const TimeRangeSlider = (props: {
             x: unpack(collectionsStart, "time").map(
               (x: number) => new Date(startDate + x / 1000)
             ),
-            y: unpack(collectionsStart, "priority").map(
-              (x: number) => Math.log(x - 100) + Math.random() * 1.5 + 0.75
-            ),
+            y: unpack(collectionsStart, "priority"),
             text: collectionsStart.map(
               (x) =>
                 `Event: ${x.type}<br>Collection: ${randomNameAdj(
