@@ -46,6 +46,12 @@ const Histogram = (props: {
           layout={{
             width: 880,
             height: 620,
+            xaxis: {
+              "title": "Resource usage"
+            },
+            yaxis: {
+              "title": "Count"
+            },
           }}
         />
       )}

@@ -267,7 +267,7 @@ export const Main = () => {
 
       <div className="legend-container"> <Scale2 key={colorScheme} brewer={colorScheme} />
               
-        <img src= {imagelegend} alt="text" style={{width:"200px", height:"200px"}}></img>
+        <img src= {imagelegend} alt="text" style={{width:"200px", maxHeight:"150px"}}></img>
       </div>
     </>
 

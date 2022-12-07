@@ -128,7 +128,7 @@ const TreeMap = (props: {
               values: unpack(dataPoints, "nodeSize"),
               type: "treemap",
               branchvalues: "remainder",
-              maxdepth: 2,
+              maxdepth: 3,
               marker: { colors: unpack(dataPoints, "color") },
               hovertext: unpack(dataPoints, "informationListing"),
               hoverinfo: "text",
