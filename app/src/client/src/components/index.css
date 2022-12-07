@@ -50,13 +50,13 @@ svg.custom path.link {
 	min-width: 500px;
 	margin-bottom: 10px;
 	position: absolute;
-	left: 610px;
+	left: 605px;
 }
 .histogram-container {
 	height: 100px;
 	width: 100px;
 	position: absolute;
-	left: 620px;
+	left: 615px;
 	bottom: 705px;
 }
 .eventbox-container {
@@ -64,6 +64,17 @@ svg.custom path.link {
 	min-width: 500px;
 	margin-bottom: 10px;
 	position: absolute;
-	left: 610px;
+	left: 605px;
 	bottom: -500px;
+}
+.legend-container {
+	position: absolute;
+	left: 1510px;
+}
+.legend-container2 {
+	height: 100px;
+	width: 100px;
+	position: absolute;
+	left: 1510px;
+	bottom: -100px;
 }

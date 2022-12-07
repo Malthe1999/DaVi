@@ -6,6 +6,8 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
+import chroma from "chroma-js";
+import { Scale, Color } from "chroma-js";
 import { useEffect, useState } from "react";
 import { Parent } from "../../../shared/types/collection-event";
 import { collectionParents } from "../gateway/backend";
@@ -18,6 +20,36 @@ import "./index.css";
 // @ts-ignore
 import { SideView } from "./side-view";
 import TimeRangeSlider from "./timerange-slider";
+import imagelegend from "./imagelegend.png";
+const LENGTH = 100;
+
+const getIndices = (length: number) => Array.from({ length }, (k, v) => v * (1 / length));
+
+const getColors = (scale: Scale<Color>, length: number) =>
+  getIndices(length)
+    .map(scale)
+    .map(x => `rgba(${((x._rgb) as unknown as string[]).map((x: string) => parseInt(x, 10)).join(",")})`);
+
+const Scale2 = ({ brewer = "OrRd" }) => {
+  const colors = getColors(chroma.scale(brewer), LENGTH);
+  return (
+    <div>
+      {colors.map(Color2)}
+    </div>
+  );
+};
+
+const Color2 = (color: any) =>
+  <div
+    style={{
+      backgroundColor: color,
+      width: 2,
+      height: 30,
+      display: "inline-block"
+    }}
+  />;
+
+const colorScheme = "YlGnBu";
 
 export const Main = () => {
   const [clickedNodes, setClickedNodes] = useState<string[]>([
@@ -38,6 +70,7 @@ export const Main = () => {
     "383608861807",
     "384616480023",
   ]);
+  
   const [filteredCollectionIds, setFilteredCollectionIds] = useState<string[]>([
     "377787092035",
     "377797560396",
@@ -231,6 +264,12 @@ export const Main = () => {
           />
         </div>
       </div>
+
+      <div className="legend-container"> <Scale2 key={colorScheme} brewer={colorScheme} />
+              
+        <img src= {imagelegend} alt="text" style={{width:"200px", height:"200px"}}></img>
+      </div>
     </>
+
   );
 };
